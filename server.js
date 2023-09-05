@@ -125,7 +125,9 @@ app.get('/api/v1/units/by_country', (req, res) => {
       }
       res.send(results[0])
     })
-    connection.exit();
+    connection.end(function(err) {
+  return;
+});;
     return
   })
 app.get('/api/v1/total/aps', (req, res) => {
@@ -139,7 +141,9 @@ app.get('/api/v1/total/aps', (req, res) => {
     }
     res.send(results[0])
   })
-  connection.exit();
+  connection.end(function(err) {
+  return;
+});;
   return
 })
 
@@ -200,7 +204,9 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
 
 
     })
-    connection.end();
+    connection.end(function(err) {
+  return;
+});;
     return
 
 //SWAP BETWEEENNN MAIL BOX AND UNIT SEARCH
@@ -225,7 +231,9 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       }
       res.send(JSON.stringify(results[0]))
     })
-    connection.exit();
+    connection.end(function(err) {
+  return;
+});;
     return;
 
 
@@ -248,7 +256,9 @@ app.get('/api/v1/unit/inbox/:messageId', authenticate, (req,res) => {
 } else {
   res.send({"429":"429"})
 }
-connection.exit();
+connection.end(function(err) {
+  return;
+});;
 return;
 })
 //Mark a message
@@ -305,7 +315,9 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
         console.log("Unauthed Request to send a message")
         return;
       }
-      connection.end();
+      connection.end(function(err) {
+        return;
+      });;
       return;
     })
 //send a message
@@ -322,7 +334,9 @@ app.post('/api/v1/unit/:fingerprint/inbox',toJson, authenticate, (req,res) => {
               }
               res.send({"200":"200"})
             })
-            connection.end();
+            connection.end(function(err) {
+              return;
+            });;
           } else {
             res.send({"429":"429"})
             console.log("Unauthed Request to send a message")
@@ -441,7 +455,9 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 res.sendStatus(500)
               }
         })
-        connection.end();
+        connection.end(function(err) {
+  return;
+});;
     
 
 
@@ -525,7 +541,9 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
             res.send({"200":"200"});
           }
         );
-        connection.exit();
+        connection.end(function(err) {
+  return;
+});;
       }
     }
   );
