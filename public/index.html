@@ -11,7 +11,7 @@
                 document.getElementById("landString").innerText=`${data.total} total units joined oPwnGRID so far from ??? different countries.`;
                 console.log(data)
             });
-            $.get("https://api.opwngrid.xyz/api/v1/total", function(data2) {
+            $.get("https://api.opwngrid.xyz/api/v1/aps/total", function(data2) {
                 document.getElementById("landString2").innerText=`${data2.total} total APs reported`;
                 console.log(data2)
             });
