@@ -127,7 +127,7 @@ app.get('/api/v1/units/by_country', (req, res) => {
     
   })
 app.get('/api/v1/total/aps', (req, res) => {
-  connection.query('SELECT COUNT(*) AS total FROM aps',
+  connection.query('SELECT COUNT(ID) AS total FROM aps',
   function(err, results, fields) {
     if (err) {
       res.sendStatus(500)
