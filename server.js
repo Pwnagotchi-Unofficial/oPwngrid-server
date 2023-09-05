@@ -518,10 +518,11 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
 
 
 
-
-
-
-
+process.on('SIGINT', function() {
+  connection.exit(function(err) {
+    process.exit(err ? 1 : 0);
+  });
+});
 //App Listen ---------------------------
 app.listen(port, () => {
   console.log(`grid listening on port ${port}`)
