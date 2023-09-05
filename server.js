@@ -85,6 +85,8 @@ app.get('*', function(req, res, next){
   next(); 
 });
 
+app.use(cors({ origin: 'https://*.opwngrid.xyz' }));
+
 app.use(express.static(__dirname + '/public'));
 //routing for main website
 

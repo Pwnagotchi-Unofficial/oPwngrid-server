@@ -7,7 +7,7 @@
 
         <script>
             $(document).ready(function() {
-                $.get(`http://10.0.0.1/api/v1/unit/${window.location.pathname.split("/search/")[1]}`, function(data) {
+                $.get(`https://api.opwngrid.xyz/api/v1/unit/${window.location.pathname.split("/search/")[1]}`, function(data) {
 
                 document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.networks} pwned networks so far.`;
                 console.log(data)
