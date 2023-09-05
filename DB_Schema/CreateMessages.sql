@@ -12,5 +12,3 @@ CREATE TABLE messages (
 	data TEXT,
     signature TEXT
     );
-INSERT INTO table_name (receiver,sender_name,sender,data,signature)
-VALUES ('d87783f9a1828e65c7fc00ea0e024783d90ab03fad328a2b3ce5129d71dd351c','booper','d87783f9a1828e65c7fc00ea0e024783d90ab03fad328a2b3ce5129d71dd351c','1','1'); 
