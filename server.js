@@ -390,7 +390,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                   console.warn("Error: data is missing or undefined");
                   data = {}
                 }
-                connection.query('UPDATE units SET data=?, UpdatedAt = CURRENT_TIMESTAMP WHERE identity = ? AND name = ? LIMIT 1',
+                connection.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP WHERE identity = ? AND name = ? LIMIT 1',
                 [JSON.stringify(data),identity[1], identity[0]],
                 function(err, results, fields) {
                     console.error(err)
