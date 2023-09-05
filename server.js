@@ -115,7 +115,7 @@ app.get('/api/v1/units/by_country', (req, res) => {
   })
 
   app.get('/api/v1/total', (req, res) => {
-    connection.connect();
+    
     connection.query('SELECT COUNT(ID) AS total, COUNT(country) AS countries FROM units',
     function(err, results, fields) {
       if (err) {
@@ -128,7 +128,7 @@ app.get('/api/v1/units/by_country', (req, res) => {
     return
   })
 app.get('/api/v1/total/aps', (req, res) => {
-  connection.connect();
+  
   connection.query('SELECT COUNT(ID) AS total FROM aps',
   function(err, results, fields) {
     if (err) {
@@ -160,7 +160,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     
     console.log(res.locals.author)
     //A mail box search has init
-    connection.connect();
+    
     connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ',
     [res.locals.author.unit_ident[1]],
     function(err, results, fields) {
@@ -206,7 +206,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     console.log('Got unit search for ' + req.params.fingerprint)
     //Query fingerprint via mysql
     fingerprint = req.params.fingerprint
-    connection.connect();
+    
     connection.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?',
     [req.params.fingerprint],
     function(err, results, fields) {
@@ -225,7 +225,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
 //Get message by id.
 app.get('/api/v1/unit/inbox/:messageId', authenticate, (req,res) => {
   if (res.locals.authorised) {
-  connection.connect();
+  
   connection.query('SELECT created_at,updated_at,seen_at,deleted_at,sender,sender_name,data,signature,id FROM messages WHERE id = ? AND receiver = ?',
   [req.params.messageId, res.locals.author.unit_ident[1]],
   function(err, results, fields) {
@@ -248,7 +248,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
   console.log(req.params.messageId,req.params.mark)
   if (req.params.mark === 'seen') {
     //mark message seen
-    connection.connect();
+    
     connection.query('UPDATE messages SET seen_at = CURRENT_TIMESTAMP WHERE id = ? AND receiver = ?',
     [req.params.messageId,res.locals.author.unit_ident[1]],
         function(err, results, fields) {
@@ -261,7 +261,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
           res.send({"200":"200"})
         })
       } else if (req.params.mark === 'deleted') {
-        connection.connect();
+        
         connection.query('DELETE FROM  messages WHERE id = ? AND receiver = ?',
         [req.params.messageId,res.locals.author.unit_ident[1]],
             function(err, results, fields) {
@@ -275,7 +275,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
             })
       
       } else if (req.params.mark === 'unseen') {
-        connection.connect();
+        
         connection.query('UPDATE messages SET seen = NULL WHERE id = ? AND receiver = ?',
         [req.params.messageId,res.locals.author.unit_ident[1]],
             function(err, results, fields) {
@@ -297,7 +297,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
 //send a message
 app.post('/api/v1/unit/:fingerprint/inbox',toJson, authenticate, (req,res) => {
   if (res.locals.authorised) {
-        connection.connect();
+        
         connection.query('INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)',
         [req.params.fingerprint,res.locals.author.unit_ident[0],res.locals.author.unit_ident[1],req.body.data,req.body.signature],
             function(err, results, fields) {
@@ -353,7 +353,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
 
     
     //check if unit is already in our database
-    connection.connect();
+    
     connection.query('SELECT * from units WHERE identity = ? AND name = ?',
     [identity[1],identity[0]],
         function(err, results, fields) {
@@ -439,7 +439,7 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
     return;
   }
   // Check if BSSID has been reported before
-  connection.connect();
+  
   connection.query('SELECT bssid, essid FROM aps WHERE bssid = (UNHEX(REPLACE(?, \':\',\'\' )))',
     [req.body.bssid],
     function(err, results, fields) {
@@ -479,7 +479,7 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
     res.sendStatus(401)
     return;
   }
-  connection.connect();
+  
   req.body.forEach(function(ap){
     
     connection.query('SELECT bssid, essid FROM aps WHERE bssid = (UNHEX(REPLACE(?, \':\',\'\' )))',
