@@ -11,6 +11,10 @@
                 document.getElementById("landString").innerText=`${data.total} total units joined oPwnGRID so far from ??? different countries.`;
                 console.log(data)
             });
+            $.get("https://api.opwngrid.xyz/api/v1/total", function(data) {
+                document.getElementById("landString2").innerText=`${data.total} total APs reported`;
+                console.log(data)
+            });
         });
         </script>
     </head>
@@ -18,6 +22,7 @@
         <h1>Welcome</h1>
         <h2>home   <a href="/convert">convert</a>   <a href="search/">search</a></h2>
         <h3 id="landString"></h3>
+        <h3 id="landString2"></h3>
 
         <body>
             <form id="search-form">
