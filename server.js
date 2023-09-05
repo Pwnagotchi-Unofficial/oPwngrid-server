@@ -94,6 +94,9 @@ app.get('/', (req, res) => {
 app.get('/search/*', (req, res) => {
   res.sendFile(__dirname + `/public/search.html`);
 })
+app.get('/convert', (req, res) => {
+  res.sendFile(__dirname + `/public/convert.html`);
+})
 //----------------------------------------------------------------------------
 //Start of statistic APIs
 app.get('/api/v1/units', (req, res) => {

@@ -16,8 +16,32 @@
     </head>
     <body style="font-family: Roboto;">
         <h1>Welcome</h1>
-        <h2><a href="/convert">convert</a>   <a href="search/">search</a></h2>
+        <h2>home   <a href="/convert">convert</a>   <a href="search/">search</a></h2>
         <h3 id="landString"></h3>
+
+        <body>
+            <form id="search-form">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button type="button" id="search-button">Search</button>
+            </form>
+        
+            <script>
+                // Get references to the input and button elements
+                const searchInput = document.getElementById('search-input');
+                const searchButton = document.getElementById('search-button');
+        
+                // Add a click event listener to the button
+                searchButton.addEventListener('click', function () {
+                    // Get the text from the input
+                    const searchText = searchInput.value.trim();
+        
+                    // Check if the input is not empty
+                    if (searchText) {
+                        // Redirect to /search/ with the search query appended
+                        window.location.href = `/search/${encodeURIComponent(searchText)}`;
+                    }
+                });
+            </script>
     </body>
 
 
