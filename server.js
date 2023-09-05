@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const express = require('express')
 require("dotenv").config();
 const app = express()
+const cors = require('cors');
 const port = process.env.PORT
 const mysql = require('mysql2');
 const connection = mysql.createConnection({
