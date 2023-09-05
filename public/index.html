@@ -8,7 +8,7 @@
         <script>
             $(document).ready(function() {
                 $.get("https://api.opwngrid.xyz/api/v1/total", function(data) {
-                document.getElementById("landString").innerText=`${data.total} total units joined oPwnGRID so far from ??? different countries.`;
+                document.getElementById("landString").innerText=`${data.total} total units joined oPwnGRID so far from ${data.countries} different countries.`;
                 console.log(data)
             });
             $.get("https://api.opwngrid.xyz/api/v1/total/aps", function(data2) {
