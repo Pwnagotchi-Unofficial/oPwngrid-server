@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+
+
+        <script>
+            $(document).ready(function() {
+                $.get(`http://10.0.0.1/api/v1/unit/${window.location.pathname.split("/search/")[1]}`, function(data) {
+
+                document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.networks} pwned networks so far.`;
+                console.log(data)
+            });
+        });
+        </script>
+    </head>
+    <body style="font-family: Roboto;">
+        <h1>Welcome</h1>
+        <h2><a href="/convert">convert</a>   <a href="#">coming soon</a></h2>
+        <h3 id="userString"></h3>
+    </body>
+
+
+</html>
