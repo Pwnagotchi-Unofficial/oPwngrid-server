@@ -24,7 +24,11 @@ function log(req, res, next) {
     //console.log(req.headers)
     next()
   }
+
+
 app.use(log)
+app.use(cors({ origin: 'https://opwngrid.xyz' }));
+
 
 function toJson(req, res, next) {
     if(req.body == undefined) {
@@ -86,7 +90,7 @@ app.get('*', function(req, res, next){
   next(); 
 });
 
-app.use(cors({ origin: 'https://opwngrid.xyz' }));
+
 
 app.use(express.static(__dirname + '/public'));
 //routing for main website
