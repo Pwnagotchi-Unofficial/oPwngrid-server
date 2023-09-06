@@ -358,7 +358,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
     
     //check if unit is already in our database
     
-    connection.query('SELECT * from units WHERE identity = ? AND name = ?',
+    connection.query('SELECT * from units WHERE identity = ?',
     [identity[1],identity[0]],
         function(err, results, fields) {
             console.log(results)
@@ -414,8 +414,8 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                   console.warn("Error: data is missing or undefined");
                   data = {}
                 }
-                connection.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP WHERE identity = ? AND name = ? LIMIT 1',
-                [JSON.stringify(data),identity[1], identity[0]],
+                connection.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1',
+                [JSON.stringify(data),identity[0], identity[1]],
                 function(err, results, fields) {
                     console.error(err)
                     if (err) {
