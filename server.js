@@ -104,6 +104,9 @@ app.get('/search/*', (req, res) => {
 app.get('/convert', (req, res) => {
   res.sendFile(__dirname + `/public/convert.html`);
 })
+app.get('/uptime', (req,res) => {
+  res.json({isUp:true})
+})
 //----------------------------------------------------------------------------
 //Start of statistic APIs
 app.get('/api/v1/units', (req, res) => {
