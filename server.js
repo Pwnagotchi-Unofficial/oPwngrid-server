@@ -116,7 +116,7 @@ app.get('/api/v1/units/by_country', (req, res) => {
 
   app.get('/api/v1/total', (req, res) => {
     
-    connection.query('SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, ',', -1)) AS countries FROM units',
+    connection.query('SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, \',\', -1)) AS countries FROM units',
     function(err, results, fields) {
       if (err) {
         res.sendStatus(500)
