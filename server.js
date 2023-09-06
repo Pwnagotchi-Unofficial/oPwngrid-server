@@ -107,7 +107,7 @@ app.get('/convert', (req, res) => {
 
 //----------------------------------------------------------------------------
 //Start of statistic APIs
-app.get('api/v1/uptime', (req,res) => {
+app.get('/api/v1/uptime', (req,res) => {
   res.json({isUp:true})
 })
 app.get('/api/v1/units', (req, res) => {
