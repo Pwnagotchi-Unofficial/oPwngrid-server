@@ -455,7 +455,7 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
       } else if (results.length >= 0) {
         console.log('Received new AP');
         // Because no APs exist with that SSID, add it to the database.
-        connection.query('INSERT INTO aps (bssid, essid, identity) VALUES (UNHEX(REPLACE(?, \':\',\'\' )), ?,?)',
+        connection.query('INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, \':\',\'\' )), ?,?, CURRENT_TIMESTAMP)',
           [req.body.bssid, req.body.essid, res.locals.author.unit_ident[1]],
           function(err, results, fields) {
             if (err) {
@@ -497,7 +497,7 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
       } else if (results.length >= 0) {
         console.log('Received new AP');
         // Because no APs exist with that SSID, add it to the database.
-        connection.query('INSERT INTO aps (bssid, essid, identity) VALUES (UNHEX(REPLACE(?, \':\',\'\' )), ?,?)',
+        connection.query('INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, \':\',\'\' )), ?,?, CURRENT_TIMESTAMP)',
           [ap.bssid, ap.essid, res.locals.author.unit_ident[1]],
           function(err, results, fields) {
             if (err) {
