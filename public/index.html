@@ -21,15 +21,11 @@
     <body style="font-family: Roboto;">
         <h1>Welcome</h1>
         <h2>home   <a href="/convert">convert</a>   <a href="search/">search</a></h2>
-        <h3 id="landString"></h3>
-        <h3 id="landString2"></h3>
-
         <body>
             <form id="search-form">
-                <input type="text" id="search-input" placeholder="Search...">
+                <input type="text" id="search-input" placeholder="Search by fingerprint...">
                 <button type="button" id="search-button">Search</button>
             </form>
-        
             <script>
                 // Get references to the input and button elements
                 const searchInput = document.getElementById('search-input');
@@ -47,6 +43,8 @@
                     }
                 });
             </script>
+            <h3 id="landString"></h3>
+            <h3 id="landString2"></h3>
     </body>
 
 
