@@ -23,29 +23,27 @@
     <body style="font-family: Roboto;">
         <h1>Search for a Device</h1>
         <h2><a href="../">home</a>   <a href="/convert">convert</a>  search</h2>
+        <form id="search-form">
+            <input type="text" id="search-input" placeholder="Search...">
+            <button type="button" id="search-button">Search</button>
+        </form>
         <h3 id="userString"></h3>
-        <body>
-            <form id="search-form">
-                <input type="text" id="search-input" placeholder="Search...">
-                <button type="button" id="search-button">Search</button>
-            </form>
-        
-            <script>
-                // Get references to the input and button elements
-                const searchInput = document.getElementById('search-input');
-                const searchButton = document.getElementById('search-button');
-        
-                // Add a click event listener to the button
-                searchButton.addEventListener('click', function () {
-                    // Get the text from the input
-                    const searchText = searchInput.value.trim();
-        
-                    // Check if the input is not empty
-                    if (searchText) {
-                        // Redirect to /search/ with the search query appended
-                        window.location.href = `/search/${encodeURIComponent(searchText)}`;
-                    }
-                });
+        <script>
+            // Get references to the input and button elements
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+    
+            // Add a click event listener to the button
+            searchButton.addEventListener('click', function () {
+                // Get the text from the input
+                const searchText = searchInput.value.trim();
+    
+                // Check if the input is not empty
+                if (searchText) {
+                    // Redirect to /search/ with the search query appended
+                    window.location.href = `/search/${encodeURIComponent(searchText)}`;
+                }
+            });
             </script>
     </body>
 
