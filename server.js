@@ -65,7 +65,7 @@ function authenticate(req, res, next) {
       decoded = jwt.verify(token, process.env.SECRET);
     } catch (err) {
       console.log(err)
-      res.status(401).json({"error":"Unauthorised request"})
+      res.status(401).json({"error":"token expired or cannot be authenticated"})
       return;
     }
     //create a check to see if token is expired
