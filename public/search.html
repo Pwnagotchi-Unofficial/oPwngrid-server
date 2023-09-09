@@ -13,7 +13,7 @@
                     data = JSON.parse(data)
                     console.log(data)
                     console.log(data.advertisement)
-                document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.advertisement.pwnd_tot} pwned networks so far.`;
+                document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
                 console.log(data)
                 } else {
                     document.getElementById("userString").innerText=`Unit doesnt exist`;
