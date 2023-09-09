@@ -65,7 +65,7 @@ function authenticate(req, res, next) {
       decoded = jwt.verify(token, process.env.SECRET);
     } catch (err) {
       console.log(err)
-      res.send('{429:429}')
+      res.send('{422')
       return;
     }
     //create a check to see if token is expired
