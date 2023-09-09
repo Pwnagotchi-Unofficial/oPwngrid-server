@@ -15,11 +15,11 @@
                 document.getElementById("landString2").innerText=`${data2.total} total APs reported`;
                 console.log(data2)
             });
-            $.get("https://api.opwngrid.xyz/api/v1/recents", function(data3) {
+            $.get("https://api.opwngrid.xyz/api/v1/recent", function(data3) {
                 let recentDiv = document.getElementById("recent");
                 for (let i = 0; i <= data.length; i++) {
                     let h2 = document.createElement("h2")
-                    h2.textContent = data[i]  //create string format of recently added devices
+                    h2.textContent = `${data3[i].name} was created ${data3[i].created_at} from the country of ${data3[i].country}`  //create string format of recently added devices
                     recentDiv.appendChild(h2)
                 }
             });
