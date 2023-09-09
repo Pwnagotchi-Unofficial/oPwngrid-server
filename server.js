@@ -26,6 +26,8 @@ function log(req, res, next) {
   }
 
 
+
+
 app.use(log)
 app.use(cors({ origin: 'https://opwngrid.xyz' }));
 
@@ -50,14 +52,12 @@ function toJson(req, res, next) {
   }
 
 function authenticate(req, res, next) {
-
-    //console.log(token)
   if (!req.headers.authorization) {
     res.locals.authorised = false
 		console.warn("Warning : unauthenticated request from ")
     next()
     return;
-	}
+	} else {
   token = req.headers.authorization.slice("Bearer ".length)
   if (token.length >= 63) {
     console.warn("Warning : authenticated request from ")
@@ -78,6 +78,7 @@ function authenticate(req, res, next) {
   console.warn("Warning : unauthenticated request from ")
   next()
   return;
+  }
 }
 
 app.get('*', function(req, res, next){ 
@@ -144,6 +145,20 @@ app.get('/api/v1/total/aps', (req, res) => {
   })
   return
 })
+app.get('/api/v1/recent', (req, res) => {
+  
+  connection.query('SELECT name,data,created_at FROM units WHERE created_at >= NOW() - INTERVAL 1 HOUR ORDER BY created_at ASC LIMIT 10',
+  function(err, results, fields) {
+    if (err) {
+      res.sendStatus(500)
+      console.log(err)
+      return;
+    }
+    res.send(results)
+  })
+  return
+})
+
 
 //End of statisics
 
