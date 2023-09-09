@@ -18,9 +18,9 @@
             $.get("https://api.opwngrid.xyz/api/v1/recent", function(data3) {
                 let recentDiv = document.getElementById("recent");
                 for (let i = 0; i <= data3.length; i++) {
-                    let h2 = document.createElement("h2")
-                    h2.textContent = `${data3[i].name} was created ${data3[i].created_at} from the country of ${data3[i].country}`  //create string format of recently added devices
-                    recentDiv.appendChild(h2)
+                    let h3 = document.createElement("h3")
+                    h3.textContent = `${data3[i].name} was created ${data3[i].created_at} from the country of ${data3[i].country}`  //create string format of recently added devices
+                    recentDiv.appendChild(h3)
                 }
             });
         });
@@ -51,9 +51,9 @@
                     }
                 });
             </script>
-            <h3 id="landString"></h3>
-            <h3 id="landString2"></h3>
-            <h3 id="recentString">Recent additions to the network</h3>
+            <h2 id="landString"></h2>
+            <h2 id="landString2"></h2>
+            <h2 id="recentString">Recent additions to the network</h2>
             <div id="recent"></div>
     </body>
 
