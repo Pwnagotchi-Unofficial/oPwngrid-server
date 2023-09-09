@@ -61,10 +61,14 @@ function authenticate(req, res, next) {
   token = req.headers.authorization.slice("Bearer ".length)
   if (token.length >= 63) {
     console.warn("Warning : authenticated request from ")
-    decoded = jwt.verify(token, process.env.SECRET);
+    try {
+      decoded = jwt.verify(token, process.env.SECRET);
+    } catch (err) {
+      console.log(err)
+      res.send('[500]')
+      return;
+    }
     //create a check to see if token is expired
-
-
     if (decoded.authorized == true) {
     res.locals.authorised = true
     } else if (decoded.authorized == false) {
