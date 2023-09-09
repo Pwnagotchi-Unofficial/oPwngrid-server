@@ -65,7 +65,7 @@ function authenticate(req, res, next) {
       decoded = jwt.verify(token, process.env.SECRET);
     } catch (err) {
       console.log(err)
-      res.status(401).json("{\"error\":\"Unauthorised request\"}")
+      res.status(401).json({"error":"Unauthorised request"})
       return;
     }
     //create a check to see if token is expired
@@ -128,7 +128,7 @@ app.get('/api/v1/units/by_country', (req, res) => {
     connection.query('SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, \',\', -1)) AS countries FROM units',
     function(err, results, fields) {
       if (err) {
-        res.status(500).json("{\"error\":\"Internal Server Error\"}")
+        res.status(500).json({"error":"Internal Server Error"})
         console.log(err)
         return;
       }
@@ -141,7 +141,7 @@ app.get('/api/v1/total/aps', (req, res) => {
   connection.query('SELECT COUNT(ID) AS total FROM aps',
   function(err, results, fields) {
     if (err) {
-      res.status(500).json("{\"error\":\"Internal Server Error\"}")
+      res.status(500).json({"error":"Internal Server Error"})
       console.log(err)
       return;
     }
@@ -154,7 +154,7 @@ app.get('/api/v1/recent', (req, res) => {
   connection.query('SELECT name,data,created_at,country FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10',
   function(err, results, fields) {
     if (err) {
-      res.status(500).json("{\"error\":\"Internal Server Error\"}")
+      res.status(500).json({"error":"Internal Server Error"})
       console.log(err)
       return;
     }
@@ -176,7 +176,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
 
   if (req.params.fingerprint === 'inbox') {
     if (res.locals.authorised === false) {
-      res.status(401).json("{\"error\":\"Unauthorised request\"}")
+      res.status(401).json({"error":"Unauthorised request"})
       return
     }
     limit = 10
@@ -189,7 +189,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     function(err, results, fields) {
       if (err) {
         console.log(err)
-        res.status(500).json("{\"error\":\"Internal Server Error\"}")
+        res.status(500).json({"error":"Internal Server Error"})
         return
       }
       console.log("total messages for unit: "+results.length)
@@ -207,7 +207,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       function(err, results, fields) {
         if (err) {
           console.log(err)
-          res.status(500).json("{\"error\":\"Internal Server Error\"}")
+          res.status(500).json({"error":"Internal Server Error"})
           return
         }
         console.log(results)
@@ -243,7 +243,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       }
       console.log(results[0])
       if (results.length === 0) {
-        res.status(404).json("{\"error\":\"Not Found\"}")
+        res.status(404).json({"error":"Not Found"})
         return
       }
       res.send(JSON.stringify(results[0]))
@@ -264,7 +264,7 @@ app.get('/api/v1/unit/inbox/:messageId', authenticate, (req,res) => {
     res.send(results[0])
   })
 } else {
-  res.status(401).json("{\"error\":\"Unauthorised request\"}")
+  res.status(401).json({"error":"Unauthorised request"})
 }
 })
 //Mark a message
@@ -282,7 +282,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
         function(err, results, fields) {
           if (err) {
             console.error(err)
-            res.status(500).json("{\"error\":\"Internal Server Error\"}")
+            res.status(500).json({"error":"Internal Server Error"})
             return;
           }
           console.log("Updated Message")
@@ -295,7 +295,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
             function(err, results, fields) {
               if (err) {
                 console.error(err)
-                res.status(500).json("{\"error\":\"Internal Server Error\"}")
+                res.status(500).json({"error":"Internal Server Error"})
                 return;
               }
               console.log("Updated Message")
@@ -309,7 +309,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
             function(err, results, fields) {
               if (err) {
                 console.error(err)
-                res.status(500).json("{\"error\":\"Internal Server Error\"}")
+                res.status(500).json({"error":"Internal Server Error"})
                 return;
               }
               console.log("Updated Message")
@@ -317,7 +317,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
             })
       
       } else {
-        res.status(401).json("{\"error\":\"Unauthorised request\"}")
+        res.status(401).json({"error":"Unauthorised request"})
         console.log("Unauthed Request to send a message")
         return;
       }
@@ -331,13 +331,13 @@ app.post('/api/v1/unit/:fingerprint/inbox',toJson, authenticate, (req,res) => {
             function(err, results, fields) {
               if (err) {
                 console.error(err)
-                res.status(500).json("{\"error\":\"Internal Server Error\"}")
+                res.status(500).json({"error":"Internal Server Error"})
                 return;
               }
               res.status(200).send()
             })
           } else {
-            res.status(401).json("{\"error\":\"Unauthorised request\"}")
+            res.status(401).json({"error":"Unauthorised request"})
             console.log("Unauthed Request to send a message")
             return;
           }
@@ -386,7 +386,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
         function(err, results, fields) {
             if (err) {
                 console.log(err)
-                res.status(500).json("{\"error\":\"Internal Server Error\"}")
+                res.status(500).json({"error":"Internal Server Error"})
                 return
             } 
             if (results.length == 0) {
@@ -439,7 +439,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                     console.error(err)
                     if (err) {
                       console.error(err)
-                      res.status(500).json("{\"error\":\"Internal Server Error\"}")
+                      res.status(500).json({"error":"Internal Server Error"})
                       return
                     }
                     console.log("Updating enrollee: " + identity[1])
@@ -448,7 +448,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
               } else if (results.length > 1) {
                 console.log('Tried to enroll, but database return error or more than 1 match')
-                res.status(500).json("{\"error\":\"Internal Server Error\"}")
+                res.status(500).json({"error":"Internal Server Error"})
                 return;
               }
         })
@@ -461,7 +461,7 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
   console.log("AP received");
   if (res.locals.authorised === false) {
     console.warn("Warning | Unauthorised device tried to send AP")
-    res.status(401).json("{\"error\":\"Unauthorised request\"}")
+    res.status(401).json({"error":"Unauthorised request"})
     return;
   }
   // Check if BSSID has been reported before
@@ -502,7 +502,7 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
   console.log("AP received");
   if (res.locals.authorised === false) {
     console.warn("Warning | Unauthorised device tried to send AP")
-    res.status(401).json("{\"error\":\"Unauthorised request\"}")
+    res.status(401).json({"error":"Unauthorised request"})
     return;
   }
   
