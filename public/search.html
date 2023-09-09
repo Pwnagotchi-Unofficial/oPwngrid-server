@@ -8,7 +8,6 @@
         <script>
             $(document).ready(function() {
                 $.get(`https://api.opwngrid.xyz/api/v1/unit/${window.location.pathname.split("/search/")[1]}`, function(data) {
-                    console.log(typeof(data))
                 if (data) {
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)

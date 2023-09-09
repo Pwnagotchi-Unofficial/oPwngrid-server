@@ -356,11 +356,10 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
 	// }
     console.log("Enroll from: " + req.body.identity) 
     identity = req.body.identity.split("@")
-    // Before we enroll we want to check the device follows our methods of verifying identity
+    // Before we enroll we want to check the device follows our methods of verifying identity 
     pub_key = Buffer.from(req.body.public_key, "base64").toString()
     KeyString = pub_key.split('RSA ').join('')
     let KeyObject = crypto.createPublicKey({ key: KeyString, format: 'pem' });
-    //verify.update(btoa(identity))
     const result = crypto.verify(
     'rsa-sha256',
     new TextEncoder().encode(req.body.identity),
@@ -376,7 +375,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
     } else if (result) {
       console.log('Signature is valid. continuing');
     } else {
-      console.log("Result is not true or false, how does this work?")
+      console.error("Result is not true or false, how does this work?")
     }
 
     
@@ -385,7 +384,6 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
     connection.query('SELECT * from units WHERE identity = ?',
     [identity[1],identity[0]],
         function(err, results, fields) {
-            console.log(results)
             if (err) {
                 console.log(err)
                 res.send([500])
@@ -396,9 +394,6 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 let country = "XX"
                 let addr = null
                 let data = {}
-
-               
-                
 
                 pub_key = Buffer.from(req.body.public_key, "base64").toString();
                 if (req && req.headers && req.headers['x-forwarded-for']) {
@@ -435,7 +430,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 if (req && req.body && req.body.data) {
                   data = req.body.data
                 } else {
-                  console.warn("Error: data is missing or undefined");
+                  console.error("Error: data is missing or undefined");
                   data = {}
                 }
                 connection.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1',
@@ -443,15 +438,18 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 function(err, results, fields) {
                     console.error(err)
                     if (err) {
+                      console.error(err)
                       res.send([500])
+                      return
                     }
-                    console.log("Updating enrollee" + identity[1])
+                    console.log("Updating enrollee: " + identity[1])
                     return
                 })
                 res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
               } else if (results.length > 1) {
                 console.log('Tried to enroll, but database return error or more than 1 match')
                 res.send([500])
+                return;
               }
         })
     
