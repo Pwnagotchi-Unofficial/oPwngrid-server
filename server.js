@@ -286,7 +286,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
             return;
           }
           console.log("Updated Message")
-          res.status(200).send()
+          res.status(200).json({"status":"success"})
         })
       } else if (req.params.mark === 'deleted') {
         
@@ -299,7 +299,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
                 return;
               }
               console.log("Updated Message")
-              res.status(200).send()
+              res.status(200).json({"status":"success"})
             })
       
       } else if (req.params.mark === 'unseen') {
@@ -313,7 +313,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
                 return;
               }
               console.log("Updated Message")
-              res.status(200).send()
+              res.status(200).json({"status":"success"})
             })
       
       } else {
@@ -334,7 +334,7 @@ app.post('/api/v1/unit/:fingerprint/inbox',toJson, authenticate, (req,res) => {
                 res.status(500).json({"error":"Internal Server Error"})
                 return;
               }
-              res.status(200).send()
+              res.status(200).json({"status":"success"})
             })
           } else {
             res.status(401).json({"error":"Unauthorised request"})
@@ -476,7 +476,7 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
       if (results.length == 1) {
         console.log('Received existing AP');
         console.log(results.length);
-        res.status(200).send()
+        res.status(200).json({"status":"success"})
         return;
       } else if (results.length >= 0) {
         console.log('Received new AP');
@@ -490,7 +490,7 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
               return;
             }
             // Send a response when the insertion is successful
-            res.status(200).send()
+            res.status(200).json({"status":"success"})
           }
         );
       }
@@ -518,7 +518,7 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
       if (results.length == 1) {
         console.log('Received existing AP');
         console.log(results.length);
-        res.status(200).send()
+        res.status(200).json({"status":"success"})
         return;
       } else if (results.length >= 0) {
         console.log('Received new AP');
@@ -532,7 +532,7 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
               return;
             }
             // Send a response when the insertion is successful
-            res.status(200).send()
+            res.status(200).json({"status":"success"})
           }
         );
       }
