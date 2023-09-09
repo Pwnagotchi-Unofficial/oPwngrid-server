@@ -124,7 +124,7 @@ app.get('/api/v1/units/by_country', (req, res) => {
     connection.query('SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, \',\', -1)) AS countries FROM units',
     function(err, results, fields) {
       if (err) {
-        res.sendStatus(500)
+        res.send([500])
         console.log(err)
         return;
       }
@@ -137,7 +137,7 @@ app.get('/api/v1/total/aps', (req, res) => {
   connection.query('SELECT COUNT(ID) AS total FROM aps',
   function(err, results, fields) {
     if (err) {
-      res.sendStatus(500)
+      res.send([500])
       console.log(err)
       return;
     }
@@ -150,7 +150,7 @@ app.get('/api/v1/recent', (req, res) => {
   connection.query('SELECT name,data,created_at,country FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10',
   function(err, results, fields) {
     if (err) {
-      res.sendStatus(500)
+      res.send([500])
       console.log(err)
       return;
     }
@@ -185,8 +185,11 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     function(err, results, fields) {
       if (err) {
         console.log(err)
+        res.send([500])
+        return
       }
       console.log("total messages for unit: "+results.length)
+      
       let offset = 0
       if (req.query.p === 1) {
         offset = 0
@@ -200,6 +203,8 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       function(err, results, fields) {
         if (err) {
           console.log(err)
+          res.send([500])
+          return
         }
         console.log(results)
       //Create the pages system pwngrid uses
@@ -209,7 +214,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
           "messages": results
         }
         console.log(messages)
-        res.send(messages)
+        res.send(JSON.stringify(messages))
     })
     
 
@@ -379,7 +384,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
             console.log(results)
             if (err) {
                 console.log(err)
-                res.sendStatus(500)
+                res.send([500])
                 return
             } 
             if (results.length == 0) {
@@ -434,7 +439,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 function(err, results, fields) {
                     console.error(err)
                     if (err) {
-                      res.sendStatus(500)
+                      res.send([500])
                     }
                     console.log("Updating enrollee" + identity[1])
                     return
@@ -442,7 +447,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                 res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
               } else if (results.length > 1) {
                 console.log('Tried to enroll, but database return error or more than 1 match')
-                res.sendStatus(500)
+                res.send([500])
               }
         })
     
