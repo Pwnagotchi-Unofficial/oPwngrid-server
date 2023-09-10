@@ -60,7 +60,7 @@ function authenticate(req, res, next) {
 	} else {
   token = req.headers.authorization.slice("Bearer ".length)
   if (token.length >= 63) {
-    console.warn("Warning : authenticated request from ")
+    
     try {
       decoded = jwt.verify(token, process.env.SECRET);
     } catch (err) {
@@ -71,7 +71,9 @@ function authenticate(req, res, next) {
     //create a check to see if token is expired
     if (decoded.authorized == true) {
     res.locals.authorised = true
+    console.warn("Warning : authenticated request from " + decoded.author.unit_ident[1])
     } else if (decoded.authorized == false) {
+      console.warn("Warning : unauthenticated request from " + decoded.author.unit_ident[1])
       res.locals.authorised = false
     }
     res.locals.author = decoded
@@ -180,7 +182,7 @@ app.get('/api/v1/recent', (req, res) => {
 app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
   if (req.params.fingerprint === 'inbox') {
     console.log("Got /api/v1/unit/:Inbox")
-    if (res.locals.authorised === false) {
+    if (!res.locals.authorised) {
       res.status(401).json({"error":"Unauthorised request"})
       return
     }
@@ -221,7 +223,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
           "records":results.length,
           "messages": results
         }
-        res.send(JSON.stringify(messages))
+        res.status(200).json(messages)
         return;
     })
     
