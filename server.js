@@ -54,7 +54,7 @@ function toJson(req, res, next) {
 function authenticate(req, res, next) {
   if (!req.headers.authorization) {
     res.locals.authorised = false
-		console.warn("Warning : unauthenticated request from ")
+		console.warn("Warning : unauthenticated request")
     next()
     return;
 	} else {
@@ -227,14 +227,10 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
         res.status(200).json(messages)
         return;
     })
-    
-
-
-
+    return
     })
-
+    return
 //SWAP BETWEEENNN MAIL BOX AND UNIT SEARCH
-
   } else {
     //got unit search
     //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
