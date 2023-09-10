@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 const jwt = require('jsonwebtoken');
 const updateToken = require("./utils/token.js")
 const crypto = require('crypto');
-
+const startTime = time.now()
 //API Gets
 //app.use(express.json())
 function log(req, res, next) {
@@ -113,7 +113,8 @@ app.get('/convert', (req, res) => {
 //----------------------------------------------------------------------------
 //Start of statistic APIs
 app.get('/api/v1/uptime', (req,res) => {
-  res.json({isUp:true})
+  time = time.now() - startTime
+  res.json({isUp:true,uptime:time})
 })
 app.get('/api/v1/units', (req, res) => {
     res.send('Custom API for a new pwn system')
@@ -268,7 +269,6 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
   console.log(req.params.messageId,req.params.mark)
   if (req.params.mark === 'seen') {
     //mark message seen
-    
     connection.query('UPDATE messages SET seen_at = CURRENT_TIMESTAMP WHERE id = ? AND receiver = ?',
     [req.params.messageId,res.locals.author.unit_ident[1]],
         function(err, results, fields) {
