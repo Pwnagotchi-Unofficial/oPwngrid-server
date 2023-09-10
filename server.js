@@ -71,9 +71,9 @@ function authenticate(req, res, next) {
     //create a check to see if token is expired
     if (decoded.authorized == true) {
     res.locals.authorised = true
-    console.warn("Warning : authenticated request from " + decoded.author.unit_ident[1])
+    console.warn("Warning : authenticated request from " + res.locals.author.unit_ident[1])
     } else if (decoded.authorized == false) {
-      console.warn("Warning : unauthenticated request from " + decoded.author.unit_ident[1])
+      console.warn("Warning : unauthenticated request from " + res.locals.author.unit_ident[1])
       res.locals.authorised = false
     }
     res.locals.author = decoded
