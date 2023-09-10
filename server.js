@@ -113,7 +113,7 @@ app.get('/convert', (req, res) => {
 //----------------------------------------------------------------------------
 //Start of statistic APIs
 app.get('/api/v1/uptime', (req,res) => {
-  time = time.now() - startTime
+  let time = time.now() - startTime
   res.json({isUp:true,uptime:time})
 })
 app.get('/api/v1/units', (req, res) => {
