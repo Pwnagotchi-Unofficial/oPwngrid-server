@@ -151,7 +151,7 @@ app.get('/api/v1/total/aps', (req, res) => {
 })
 app.get('/api/v1/recent', (req, res) => {
   
-  connection.query('SELECT name,data,created_at,country FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10',
+  connection.query('SELECT name,data,created_at,country,identity FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10',
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})

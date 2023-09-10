@@ -21,7 +21,8 @@
                 let recentDiv = document.getElementById("recent");
                 for (let i = 0; i <= data3.length; i++) {
                     let h3 = document.createElement("h3")
-                    h3.textContent = `${data3[i].name} was created ${data3[i].created_at} from the country of ${regionNames.of(data3[i].country)}`  //create string format of recently added devices
+                    let aHref = `<a href="/search/${data3[i].identity}">${data3[i].name}</a>`
+                    h3.textContent = `${aHref} was created ${data3[i].created_at} from the country of ${regionNames.of(data3[i].country)}`  //create string format of recently added devices
                     recentDiv.appendChild(h3)
                 }
             });
