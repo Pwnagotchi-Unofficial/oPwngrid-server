@@ -104,8 +104,7 @@ app.get('*', function(req, res, next){
       return;
     }
   } 
-  next();
-  return
+  res.status(404).json({"error":"Not Found"})
 });
 
 
@@ -217,9 +216,7 @@ app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
           "records":results.length,
           "messages": results
         }
-        console.log("sending messages")
         res.status(200).json(messages)
-        console.log("aftersending messages")
         return;
       })
     return
