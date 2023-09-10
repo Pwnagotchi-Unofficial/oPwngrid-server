@@ -170,11 +170,8 @@ app.get('/api/v1/recent', (req, res) => {
 
 //Searching for a unit + allow a unit to get mail box
 app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
-  console.log("Got /api/v1/unit/:fingerprint")
-  console.log(req.params.fingerprint)
-  console.log(res.locals)
-
   if (req.params.fingerprint === 'inbox') {
+    console.log("Got /api/v1/unit/:Inbox")
     if (res.locals.authorised === false) {
       res.status(401).json({"error":"Unauthorised request"})
       return
@@ -210,14 +207,12 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
           res.status(500).json({"error":"Internal Server Error"})
           return
         }
-        console.log(results)
       //Create the pages system pwngrid uses
         messages = {
           "pages": (pages),//pages
           "records":results.length,
           "messages": results
         }
-        console.log(messages)
         res.send(JSON.stringify(messages))
     })
     
@@ -233,8 +228,6 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
     console.log('Got unit search for ' + req.params.fingerprint)
     //Query fingerprint via mysql
-    fingerprint = req.params.fingerprint
-    
     connection.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?',
     [req.params.fingerprint],
     function(err, results, fields) {
@@ -260,7 +253,6 @@ app.get('/api/v1/unit/inbox/:messageId', authenticate, (req,res) => {
     if (err) {
       console.log(err)
     }
-    console.log(0)
     res.send(results[0])
   })
 } else {
