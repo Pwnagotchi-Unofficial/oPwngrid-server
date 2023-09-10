@@ -176,59 +176,57 @@ app.get('/api/v1/recent', (req, res) => {
 
 //End of statisics
 
-
-
-//Searching for a unit + allow a unit to get mail box
-app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
-  if (req.params.fingerprint === 'inbox') {
-    console.log("Got /api/v1/unit/:Inbox")
-    limit = 10
+app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
+  console.log("Got /api/v1/unit/:Inbox")
+  limit = 10
     
-    console.log(res.locals.author)
-    //A mail box search has init
+  console.log(res.locals.author)
+  //A mail box search has init
     
-    connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ',
-    [res.locals.author.unit_ident[1]],
-    function(err, results, fields) {
-      if (err) {
-        console.log(err)
-        //res.status(500).json({"error":"Internal Server Error"})
-        return
-      }
-      console.log("total messages for unit: "+results.length)
-      
-      let offset = 0
-      if (req.query.p === 1) {
-        offset = 0
-        pages = Math.ceil(results.length / limit)
-      } else {
-        offset = (req.query.p * limit) - limit
-        pages = Math.ceil(results.length / limit)
-      }
-      connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,data,signature,id FROM messages WHERE receiver = ? LIMIT ? OFFSET ?',
+  connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ',
+  [res.locals.author.unit_ident[1]],
+  function(err, results, fields) {
+    if (err) {
+      console.log(err)
+      res.status(500).json({"error":"Internal Server Error"})
+      return
+    }
+    console.log("total messages for unit: "+results.length)
+    
+    let offset = 0
+    if (req.query.p === 1) {
+      offset = 0
+      pages = Math.ceil(results.length / limit)
+    } else {
+      offset = (req.query.p * limit) - limit
+      pages = Math.ceil(results.length / limit)
+    }
+    connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,data,signature,id FROM messages WHERE receiver = ? LIMIT ? OFFSET ?',
       [res.locals.author.unit_ident[1],limit,offset],
       function(err, results, fields) {
         if (err) {
           console.log(err)
-          //res.status(500).json({"error":"Internal Server Error"})
+          res.status(500).json({"error":"Internal Server Error"})
           return
         }
-      //Create the pages system pwngrid uses
+        //Create the pages system pwngrid uses
         messages = {
           "pages": pages,//pages
           "records":results.length,
           "messages": results
         }
         console.log("sending messages")
-        //res.status(200).json(messages)
+        res.status(200).json(messages)
         console.log("aftersending messages")
         return;
-    })
+      })
     return
     })
-    return
-//SWAP BETWEEENNN MAIL BOX AND UNIT SEARCH
-  } else {
+  return
+})
+
+//Searching for a unit + allow a unit to get mail box
+app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     //got unit search
     //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
     console.log('Got unit search for ' + req.params.fingerprint)
@@ -246,7 +244,6 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       }
       res.send(JSON.stringify(results[0]))
     })
-  }
 })
 //Get message by id.
 app.get('/api/v1/unit/inbox/:messageId', authenticate, (req,res) => {
