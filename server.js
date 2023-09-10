@@ -192,7 +192,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     function(err, results, fields) {
       if (err) {
         console.log(err)
-        res.status(500).json({"error":"Internal Server Error"})
+        //res.status(500).json({"error":"Internal Server Error"})
         return
       }
       console.log("total messages for unit: "+results.length)
