@@ -222,6 +222,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
           "messages": results
         }
         res.send(JSON.stringify(messages))
+        return;
     })
     
 
