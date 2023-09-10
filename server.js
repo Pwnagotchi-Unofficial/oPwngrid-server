@@ -182,10 +182,6 @@ app.get('/api/v1/recent', (req, res) => {
 app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
   if (req.params.fingerprint === 'inbox') {
     console.log("Got /api/v1/unit/:Inbox")
-    if (!res.locals.authorised) {
-      res.status(401).json({"error":"Unauthorised request"})
-      return
-    }
     limit = 10
     
     console.log(res.locals.author)
@@ -225,7 +221,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
         }
         console.log("sending messages")
         res.status(200).json(messages)
-        console.log("after sending messages")
+        console.log("aftersending messages")
         return;
     })
     return
