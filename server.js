@@ -210,7 +210,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       function(err, results, fields) {
         if (err) {
           console.log(err)
-          res.status(500).json({"error":"Internal Server Error"})
+          //res.status(500).json({"error":"Internal Server Error"})
           return
         }
       //Create the pages system pwngrid uses
@@ -220,7 +220,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
           "messages": results
         }
         console.log("sending messages")
-        res.status(200).json(messages)
+        //res.status(200).json(messages)
         console.log("aftersending messages")
         return;
     })
