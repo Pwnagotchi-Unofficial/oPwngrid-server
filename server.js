@@ -77,12 +77,11 @@ function authenticate(req, res, next) {
       console.warn("Warning : unauthenticated request from " + res.locals.author.unit_ident[1])
       res.locals.authorised = false
     }
-    
     next()
     return;
   }
   res.locals.authorised = false
-  console.warn("Warning : unauthenticated request from ")
+  console.warn("Warning : unauthenticated request")
   next()
   return;
   }
@@ -220,11 +219,13 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
         }
       //Create the pages system pwngrid uses
         messages = {
-          "pages": (pages),//pages
+          "pages": pages,//pages
           "records":results.length,
           "messages": results
         }
+        console.log("sending messages")
         res.status(200).json(messages)
+        console.log("after sending messages")
         return;
     })
     return
