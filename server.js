@@ -63,8 +63,10 @@ function authenticate(req, res, next) {
     
     try {
       decoded = jwt.verify(token, process.env.SECRET);
+      console.log("Decoded")
     } catch (err) {
       console.log(err)
+      console.log("Error Decoding sending 401")
       res.status(401).json({"error":"token expired or cannot be authenticated"})
       return;
     }
@@ -96,12 +98,14 @@ app.get('*', function(req, res, next){
   } else if (req.headers.host == 'api.opwngrid.xyz') {
     if (req.url.includes("/api/v1/")) {
       next(); 
+      return
     } else {
       res.status(404).json({"error":"Not Found"})
       return;
     }
   } 
-  next(); 
+  next();
+  return
 });
 
 
@@ -177,12 +181,10 @@ app.get('/api/v1/recent', (req, res) => {
 //End of statisics
 
 app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
-  console.log("Got /api/v1/unit/:Inbox")
+  console.log("Got /api/v1/unit/inbox/")
   limit = 10
-    
   console.log(res.locals.author)
   //A mail box search has init
-    
   connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ',
   [res.locals.author.unit_ident[1]],
   function(err, results, fields) {
