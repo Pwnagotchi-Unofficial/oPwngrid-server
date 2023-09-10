@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 const jwt = require('jsonwebtoken');
 const updateToken = require("./utils/token.js")
 const crypto = require('crypto');
-const startTime = time.now()
+const startTime = Date.now()
 //API Gets
 //app.use(express.json())
 function log(req, res, next) {
@@ -113,7 +113,7 @@ app.get('/convert', (req, res) => {
 //----------------------------------------------------------------------------
 //Start of statistic APIs
 app.get('/api/v1/uptime', (req,res) => {
-  let time = time.now() - startTime
+  let time = Date.now() - startTime
   res.json({isUp:true,uptime:time})
 })
 app.get('/api/v1/units', (req, res) => {
