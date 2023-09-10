@@ -63,7 +63,6 @@ function authenticate(req, res, next) {
     
     try {
       decoded = jwt.verify(token, process.env.SECRET);
-      console.log("Decoded")
     } catch (err) {
       console.log(err)
       console.log("Error Decoding sending 401")
@@ -182,7 +181,6 @@ app.get('/api/v1/recent', (req, res) => {
 app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
   console.log("Got /api/v1/unit/inbox/")
   limit = 10
-  console.log(res.locals.author)
   //A mail box search has init
   connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ',
   [res.locals.author.unit_ident[1]],
@@ -236,7 +234,6 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
       if (err) {
         console.log(err)
       }
-      console.log(results[0])
       if (results.length === 0) {
         res.status(404).json({"error":"Not Found"})
         return
