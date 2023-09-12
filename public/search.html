@@ -63,7 +63,9 @@ else {
 
             $(document).ready(function() {
                 $.get(`https://api.opwngrid.xyz/api/v1/search/${window.location.pathname.split("/search/")[1]}`, function(data) {
+                    
                 if (!data.error) {
+                    let body = document.getElementById("body");
                     let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
@@ -91,16 +93,36 @@ else {
                         document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${regionNames.of(data.country)}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
 
                     }
+                    let h3 = document.createElement("h3")
                     document.getElementById("contactString").innerHTML=`You can contact ${data.name} via PwnMail at:`
                     document.getElementById("contactStringID").innerHTML=`${data.identity}`
                 } else {
+                    document.getElementById("contactStringID").innerHTML=`Unit doesnt exist`
+
                     document.getElementById("userStringName").innerText=`Unit doesnt exist`;
                 }
             });
         });
         </script>
+                <script>
+                    // Get references to the input and button elements
+                    const searchInput = document.getElementById('search-input');
+                    const searchButton = document.getElementById('search-button');
+            
+                    // Add a click event listener to the button
+                    searchButton.addEventListener('click', function () {
+                        // Get the text from the input
+                        const searchText = searchInput.value.trim();
+            
+                        // Check if the input is not empty
+                        if (searchText) {
+                            // Redirect to /search/ with the search query appended
+                            window.location.href = `/search/${encodeURIComponent(searchText)}`;
+                        }
+                    });
+                    </script>
     </head>
-    <body style="font-family: Roboto;">
+    <body style="font-family: Roboto;" id="body">
         <h1>Search for a Device</h1>
         <h2><a href="../">home</a>   <a href="/convert">convert</a>  search</h2>
         <form id="search-form">
@@ -111,24 +133,8 @@ else {
         <h3 id="userString"></h3>
         <h2 id="Contact">Contact</h2>
         <h3 id="contactString"></h3>
-        <h3 id="contactStringID"></h3>
-        <script>
-            // Get references to the input and button elements
-            const searchInput = document.getElementById('search-input');
-            const searchButton = document.getElementById('search-button');
-    
-            // Add a click event listener to the button
-            searchButton.addEventListener('click', function () {
-                // Get the text from the input
-                const searchText = searchInput.value.trim();
-    
-                // Check if the input is not empty
-                if (searchText) {
-                    // Redirect to /search/ with the search query appended
-                    window.location.href = `/search/${encodeURIComponent(searchText)}`;
-                }
-            });
-            </script>
+        <h3 id="contactStringID">No Pwnagotchi was searched for.</h3>
+
     </body>
 
 

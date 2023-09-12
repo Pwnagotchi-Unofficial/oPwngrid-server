@@ -120,6 +120,9 @@ app.get('/', (req, res) => {
 app.get('/search/*', (req, res) => {
   res.sendFile(__dirname + `/public/search.html`);
 })
+app.get('/search', (req, res) => {
+  res.sendFile(__dirname + `/public/search.html`);
+})
 app.get('/convert', (req, res) => {
   res.sendFile(__dirname + `/public/convert.html`);
 })
