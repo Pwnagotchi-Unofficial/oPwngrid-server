@@ -225,7 +225,28 @@ app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
   return
 })
 
-//Searching for a unit + allow a unit to get mail box
+//Searching for a unit 
+//via web search api
+app.get('/api/v1/search/:fingerprint', authenticate, (req, res) => {
+  //got unit search
+  //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
+  console.log('Got web search for ' + req.params.fingerprint)
+  //Query fingerprint via mysql
+  connection.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?',
+  [req.params.fingerprint],
+  function(err, results, fields) {
+    if (err) {
+      console.log(err)
+    }
+    if (results.length === 0) {
+      
+      res.status(200).json({"error":"Not Found"})
+      return
+    }
+    res.send(JSON.stringify(results[0]))
+  })
+})
+//Via pwngrid binary
 app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     //got unit search
     //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
@@ -238,6 +259,7 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
         console.log(err)
       }
       if (results.length === 0) {
+
         res.status(404).json({"error":"Not Found"})
         return
       }

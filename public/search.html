@@ -7,14 +7,15 @@
 
         <script>
             $(document).ready(function() {
-                $.get(`https://api.opwngrid.xyz/api/v1/unit/${window.location.pathname.split("/search/")[1]}`, function(data) {
-                if (data) {
+                $.get(`https://api.opwngrid.xyz/api/v1/search/${window.location.pathname.split("/search/")[1]}`, function(data) {
+                if (!data.error) {
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
-                document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
-                console.log(data)
+                    document.getElementById("userStringName").innerText=`${data.name}`;
+                    document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+
                 } else {
-                    document.getElementById("userString").innerText=`Unit doesnt exist`;
+                    document.getElementById("userStringName").innerText=`Unit doesnt exist`;
                 }
             });
         });
@@ -27,6 +28,7 @@
             <input type="text" id="search-input" placeholder="Search...">
             <button type="button" id="search-button">Search</button>
         </form>
+        <h1 id="userStringName"></h1>
         <h3 id="userString"></h3>
         <script>
             // Get references to the input and button elements
