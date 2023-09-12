@@ -7,7 +7,44 @@
 
         <script>
 
+function timeDifference(current, previous) {
 
+var msPerMinute = 60 * 1000;
+var msPerHour = msPerMinute * 60;
+var msPerDay = msPerHour * 24;
+var msPerMonth = msPerDay * 30;
+var msPerYear = msPerDay * 365;
+
+var elapsed = current - previous;
+
+if (elapsed < msPerMinute) {
+     return Math.round(elapsed/1000) + ' seconds ago';   
+}
+
+else if (elapsed < msPerHour) {
+     return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+}
+
+else if (elapsed < msPerDay ) {
+     return Math.round(elapsed/msPerHour ) + ' hours ago';   
+}
+
+else if (elapsed < msPerMonth) {
+    return 'about ' + Math.round(elapsed/msPerDay) + ' days ago';   
+}
+
+else if (elapsed < msPerYear) {
+    return 'about ' + Math.round(elapsed/msPerMonth) + ' months ago';   
+}
+
+else {
+    if (Math.round(elapsed/msPerYear ) == 1) {
+        return 'about ' + Math.round(elapsed/msPerYear ) + ` year ago`
+    } else {
+        return 'about ' + Math.round(elapsed/msPerYear ) + ` years ago`
+    }
+}
+}
 
 
             $(document).ready(function() {
@@ -25,15 +62,21 @@
                 let recentDiv = document.getElementById("recent");
                 for (let i = 0; i <= data3.length; i++) {
 
-
                     let dateCreated = new Date(data3[i].created_at);
 
                     dateCreated.toLocaleString('default', { timeZoneName: 'short' });
 
+                    let dateUpdated = new Date(data.updated_at);
+
+                    let MsCreatedAt = dateCreated.getTime()
+
+                    let timeNow = Date.now().getTime()
+
+
 
                     let h3 = document.createElement("h3")
                     let aHref = `<a href="/search/${data3[i].identity}">${data3[i].name}</a>`
-                    h3.innerHTML = `${aHref} was created ${} from the country of ${regionNames.of(data3[i].country)}`  //create string format of recently added devices
+                    h3.innerHTML = `${aHref} was created ${timeDifference(timeNow, MsCreatedAt)} from the country of ${regionNames.of(data3[i].country)}`  //create string format of recently added devices
                     recentDiv.appendChild(h3)
                 }
             });
