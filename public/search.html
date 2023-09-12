@@ -63,7 +63,9 @@ else {
                         let MsCreatedAt = dateCreated.getTime()
                         let MsUpdatedAt = dateUpdated.getTime()
 
-                        let timeNow = Date.now().getTime()
+                        let now = new Date()
+
+                        let timeNow = now.getTime()
 
                         document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} and has been seen online ${timeDifference(timeNow,MsUpdatedAt)} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
                     } else {
