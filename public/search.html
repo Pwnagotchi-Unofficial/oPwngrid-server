@@ -91,7 +91,8 @@ else {
                         document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${regionNames.of(data.country)}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
 
                     }
-
+                    document.getElementById("contactString").innerHTML=`You can contact ${data.name} via PwnMail at:`
+                    document.getElementById("contactStringID").innerHTML=`${data.identity}`
                 } else {
                     document.getElementById("userStringName").innerText=`Unit doesnt exist`;
                 }
@@ -108,6 +109,9 @@ else {
         </form>
         <h1 id="userStringName"></h1>
         <h3 id="userString"></h3>
+        <h2 id="Contact">Contact</h2>
+        <h3 id="contactString"></h3>
+        <h3 id="contactStringID"></h3>
         <script>
             // Get references to the input and button elements
             const searchInput = document.getElementById('search-input');
