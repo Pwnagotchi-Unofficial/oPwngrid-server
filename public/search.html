@@ -31,7 +31,7 @@ else if (elapsed < msPerDay ) {
 }
 
 else if (elapsed < msPerMonth) {
-    return 'about ' + Math.round(elapsed/msPerDay) + ' days ago';   
+    return Math.round(elapsed/msPerDay) + ' days ago';   
 }
 
 else if (elapsed < msPerYear) {
