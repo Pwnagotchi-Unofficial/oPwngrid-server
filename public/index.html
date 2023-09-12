@@ -18,19 +18,31 @@ var msPerYear = msPerDay * 365;
 var elapsed = current - previous;
 
 if (elapsed < msPerMinute) {
-     return Math.round(elapsed/1000) + ' seconds ago';   
+    return Math.round(elapsed/1000) + ' seconds ago';   
 }
 
 else if (elapsed < msPerHour) {
-     return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+    if (Math.round(elapsed/msPerMinute ) == 1) {
+        return Math.round(elapsed/msPerMinute ) + ` minute ago`
+    } else {
+        return Math.round(elapsed/msPerMinute ) + ` minutes ago`
+    }
 }
 
 else if (elapsed < msPerDay ) {
-     return Math.round(elapsed/msPerHour ) + ' hours ago';   
+    if (Math.round(elapsed/msPerHour ) == 1) {
+        return Math.round(elapsed/msPerHour ) + ` hour ago`
+    } else {
+        return Math.round(elapsed/msPerHour ) + ` hours ago`
+    }
 }
 
 else if (elapsed < msPerMonth) {
-    return Math.round(elapsed/msPerDay) + ' days ago';   
+    if (Math.round(elapsed/msPerDay ) == 1) {
+        return Math.round(elapsed/msPerDay ) + ` day ago`
+    } else {
+        return Math.round(elapsed/msPerDay ) + ` days ago`
+    }
 }
 
 else if (elapsed < msPerYear) {
