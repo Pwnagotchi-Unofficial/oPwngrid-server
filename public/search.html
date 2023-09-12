@@ -6,13 +6,41 @@
 
 
         <script>
+        function formatTimestamp(date) {
+            let hours = date.getHours().toString().padStart(2, "0");
+            let minutes = date.getMinutes().toString().padStart(2, "0");
+            let day = date.getDate();
+            let month = date.toLocaleString('default', { month: 'long' });
+            let year = date.getFullYear();
+            let dayOfWeek = date.toLocaleString('default', { weekday: 'long' });
+            let timezoneAbbreviation = date.toLocaleString('default', { timeZoneName: 'short' });
+  
+            return hours + ":" + minutes + " " + dayOfWeek + " " + day + " " + month + " " + year + " " + timezoneAbbreviation;
+            }
+            
             $(document).ready(function() {
                 $.get(`https://api.opwngrid.xyz/api/v1/search/${window.location.pathname.split("/search/")[1]}`, function(data) {
                 if (!data.error) {
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
                     document.getElementById("userStringName").innerText=`${data.name}`;
-                    document.getElementById("userString").innerText=`Unit ${data.name} registered ${data.created_at} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+
+                    let dateCreated = new Date(data.created_at);
+                    let dateUpdated = new Date(data.updated_at);
+
+                    let userTimezoneOffset = timestamp.getTimezoneOffset();
+
+                    let userDateCreated = new Date(dateCreated.getTime() - userTimezoneOffset * 60000);
+                    let userDateUpdated = new Date(dateUpdated.getTime() - userTimezoneOffset * 60000);
+
+
+
+                    if (data.updated_at) {
+                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${formatTimestamp(userDateCreated)} and has been seen online ${data.updated_at} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+                    } else {
+                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${formatTimestamp(userDateCreated)} from ${formatTimestamp(userDateUpdated)}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+
+                    }
 
                 } else {
                     document.getElementById("userStringName").innerText=`Unit doesnt exist`;
