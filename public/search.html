@@ -81,6 +81,12 @@ else {
                         document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} and was seen online ${timeDifference(timeNow,MsUpdatedAt)} from ${regionNames.of(data.country)}. Its AI has lived ${data.data.brain.epochs_lived} epochs and trained for ${data.data.brain.epochs_trained} It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
                     } else {
                         let dateCreated = new Date(data.created_at);
+
+                        let MsCreatedAt = dateCreated.getTime()
+
+                        let now = new Date()
+
+                        let timeNow = now.getTime()
                         document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${regionNames.of(data.country)}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
 
                     }
