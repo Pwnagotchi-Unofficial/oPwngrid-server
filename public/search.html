@@ -64,6 +64,7 @@ else {
             $(document).ready(function() {
                 $.get(`https://api.opwngrid.xyz/api/v1/search/${window.location.pathname.split("/search/")[1]}`, function(data) {
                 if (!data.error) {
+                    let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
                     document.getElementById("userStringName").innerText=`${data.name}`;
