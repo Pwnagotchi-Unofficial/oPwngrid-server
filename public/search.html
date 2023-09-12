@@ -67,7 +67,7 @@ else {
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
                     document.getElementById("userStringName").innerText=`${data.name}`;
-                    if (data.updated_at) {
+                    if (data.updated_at && data.brain) {
                         let dateCreated = new Date(data.created_at);
                         let dateUpdated = new Date(data.updated_at);
 
@@ -78,10 +78,10 @@ else {
 
                         let timeNow = now.getTime()
 
-                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} and has been seen online ${timeDifference(timeNow,MsUpdatedAt)} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} and was seen online ${timeDifference(timeNow,MsUpdatedAt)} from ${regionNames.of(data.country)}. Its AI has lived ${data.data.brain.epochs_lived} epochs and trained for ${data.data.brain.epochs_trained} It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
                     } else {
                         let dateCreated = new Date(data.created_at);
-                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${data.country}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${regionNames.of(data.country)}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
 
                     }
 
