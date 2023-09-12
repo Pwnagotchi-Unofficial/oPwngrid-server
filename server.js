@@ -117,7 +117,7 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 })
-app.get('/search/:unit', (req, res) => {
+app.get('/search/*', (req, res) => {
   res.sendFile(__dirname + `/public/search.html`);
 })
 app.get('/convert', (req, res) => {
