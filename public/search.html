@@ -67,7 +67,7 @@ else {
                     let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
-                    document.getElementById("userStringName").innerText=`${data.name}`;
+                    document.getElementById("userStringName").innerText=`${data.name}        ${data.data.advertisement.face}`;
                     if (data.updated_at && data.data.brain) {
                         let dateCreated = new Date(data.created_at);
                         let dateUpdated = new Date(data.updated_at);
@@ -79,7 +79,7 @@ else {
 
                         let timeNow = now.getTime()
 
-                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} and was seen online ${timeDifference(timeNow,MsUpdatedAt)} from ${regionNames.of(data.country)}. Its AI has lived ${data.data.brain.epochs_lived} epochs and trained for ${data.data.brain.epochs_trained} It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} and was seen online ${timeDifference(timeNow,MsUpdatedAt)} from ${regionNames.of(data.country)}. Its AI has lived ${data.data.brain.epochs_lived} epochs and trained for ${data.data.brain.epochs_trained}. It has reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
                     } else {
                         let dateCreated = new Date(data.created_at);
 
