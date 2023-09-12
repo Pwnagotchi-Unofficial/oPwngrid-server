@@ -68,7 +68,7 @@ else {
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
                     document.getElementById("userStringName").innerText=`${data.name}`;
-                    if (data.updated_at && data.brain) {
+                    if (data.updated_at && data.data.brain) {
                         let dateCreated = new Date(data.created_at);
                         let dateUpdated = new Date(data.updated_at);
 
