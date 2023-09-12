@@ -104,23 +104,7 @@ else {
             });
         });
         </script>
-                <script>
-                    // Get references to the input and button elements
-                    const searchInput = document.getElementById('search-input');
-                    const searchButton = document.getElementById('search-button');
-            
-                    // Add a click event listener to the button
-                    searchButton.addEventListener('click', function () {
-                        // Get the text from the input
-                        const searchText = searchInput.value.trim();
-            
-                        // Check if the input is not empty
-                        if (searchText) {
-                            // Redirect to /search/ with the search query appended
-                            window.location.href = `/search/${encodeURIComponent(searchText)}`;
-                        }
-                    });
-                    </script>
+
     </head>
     <body style="font-family: Roboto;" id="body">
         <h1>Search for a Device</h1>
@@ -134,7 +118,23 @@ else {
         <h2 id="Contact">Contact</h2>
         <h3 id="contactString"></h3>
         <h3 id="contactStringID">No Pwnagotchi was searched for.</h3>
-
+        <script>
+            // Get references to the input and button elements
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+    
+            // Add a click event listener to the button
+            searchButton.addEventListener('click', function () {
+                // Get the text from the input
+                const searchText = searchInput.value.trim();
+    
+                // Check if the input is not empty
+                if (searchText) {
+                    // Redirect to /search/ with the search query appended
+                    window.location.href = `/search/${encodeURIComponent(searchText)}`;
+                }
+            });
+            </script>
     </body>
 
 
