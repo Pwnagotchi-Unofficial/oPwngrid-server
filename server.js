@@ -374,6 +374,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
 	// 	"signature":  signature64,
 	// 	"data":       c.data,
 	// }
+    console.log(req.body)
     console.log("Enroll from: " + req.body.identity) 
     identity = req.body.identity.split("@")
     // Before we enroll we want to check the device follows our methods of verifying identity 
