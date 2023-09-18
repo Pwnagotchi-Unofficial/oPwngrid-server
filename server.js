@@ -392,11 +392,10 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
 
     if (!result) {
       console.warn('Signature is NOT valid. A device has attempted to enroll that cannot verify its self.');
+            res.status(401).json({"error":"signature is invalid"})
       return;
     } else if (result) {
       console.log('Signature is valid. continuing');
-      res.status(401).json({"error":"signature is invalid"})
-      return;
     } else {
       console.error("Result is not true or false, how does this work?")
             res.status(401).json({"error":"signature is invalid"})
