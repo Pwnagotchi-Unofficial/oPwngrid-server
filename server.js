@@ -395,8 +395,12 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
       return;
     } else if (result) {
       console.log('Signature is valid. continuing');
+      res.status(401).json({"error":"signature is invalid"})
+      return;
     } else {
       console.error("Result is not true or false, how does this work?")
+            res.status(401).json({"error":"signature is invalid"})
+            return;
     }
 
     
