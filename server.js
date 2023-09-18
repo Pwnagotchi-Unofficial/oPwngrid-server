@@ -188,8 +188,15 @@ app.get('/api/v1/recent', (req, res) => {
 //End of statisics
 
 app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
+  if (res.locals.authorised == false) {
+    res.status(401).json({"error":"token expired or cannot be authenticated"})
+    return;
+  }
+
+
   console.log("Got /api/v1/unit/inbox/")
   limit = 10
+
   //A mail box search has init
   connection.query('SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ',
   [res.locals.author.unit_ident[1]],
