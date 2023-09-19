@@ -265,6 +265,8 @@ app.get('/api/v1/search/:fingerprint', authenticate, (req, res) => {
   function(err, results, fields) {
     if (err) {
       console.log(err)
+      res.status(500).json({"error":"Internal Server Error"})
+      return
     }
     if (results.length === 0) {
       
@@ -285,6 +287,9 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
     function(err, results, fields) {
       if (err) {
         console.log(err)
+        res.status(500).json({"error":"Internal Server Error"})
+        return
+
       }
       if (results.length === 0) {
 
@@ -297,12 +302,13 @@ app.get('/api/v1/unit/:fingerprint', authenticate, (req, res) => {
 //Get message by id.
 app.get('/api/v1/unit/inbox/:messageId', authenticate, (req,res) => {
   if (res.locals.authorised) {
-  
   connection.query('SELECT created_at,updated_at,seen_at,deleted_at,sender,sender_name,data,signature,id FROM messages WHERE id = ? AND receiver = ?',
   [req.params.messageId, res.locals.author.unit_ident[1]],
   function(err, results, fields) {
     if (err) {
       console.log(err)
+      res.status(500).json({"error":"Internal Server Error"})
+      return
     }
     res.send(results[0])
   })
@@ -329,6 +335,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
           }
           console.log("Updated Message")
           res.status(200).json({"status":"success"})
+          return;
         })
       } else if (req.params.mark === 'deleted') {
         
@@ -342,6 +349,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
               }
               console.log("Updated Message")
               res.status(200).json({"status":"success"})
+              return;
             })
       
       } else if (req.params.mark === 'unseen') {
@@ -356,6 +364,7 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
               }
               console.log("Updated Message")
               res.status(200).json({"status":"success"})
+              return;
             })
       
       } else {
@@ -367,24 +376,23 @@ app.get('/api/v1/unit/inbox/:messageId/:mark', authenticate, (req,res) => {
 //send a message
 app.post('/api/v1/unit/:fingerprint/inbox',toJson, authenticate, (req,res) => {
   if (res.locals.authorised) {
-        
-        connection.query('INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)',
-        [req.params.fingerprint,res.locals.author.unit_ident[0],res.locals.author.unit_ident[1],req.body.data,req.body.signature],
-            function(err, results, fields) {
-              if (err) {
-                console.error(err)
-                res.status(500).json({"error":"Internal Server Error"})
-                return;
-              }
-              res.status(200).json({"status":"success"})
-            })
-          } else {
-            res.status(401).json({"error":"Unauthorised request"})
-            console.log("Unauthed Request to send a message")
+    connection.query('INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)',
+    [req.params.fingerprint,res.locals.author.unit_ident[0],res.locals.author.unit_ident[1],req.body.data,req.body.signature],
+        function(err, results, fields) {
+          if (err) {
+            console.error(err)
+            res.status(500).json({"error":"Internal Server Error"})
             return;
           }
+          res.status(200).json({"status":"success"})
+          return;
         })
-      
+      } else {
+        res.status(401).json({"error":"Unauthorised request"})
+        console.log("Unauthed Request to send a message")
+        return;
+  }
+})
 //API Posts
 //-----------------------------------------------------------------------------
 //enroll post
@@ -396,59 +404,56 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
 	// 	"signature":  signature64,
 	// 	"data":       c.data,
 	// }
-    console.log(req.body)
-    console.log("Enroll from: " + req.body.identity) 
-    identity = req.body.identity.split("@")
-    // Before we enroll we want to check the device follows our methods of verifying identity 
-    pub_key = Buffer.from(req.body.public_key, "base64").toString()
-    KeyString = pub_key.split('RSA ').join('')
-    let KeyObject = crypto.createPublicKey({ key: KeyString, format: 'pem' });
-    const result = crypto.verify(
-    'rsa-sha256',
-    new TextEncoder().encode(req.body.identity),
-    {
-            key: KeyString,
-            padding: crypto.constants.RSA_PKCS1_PSS_PADDING
-    },
-    Buffer.from(req.body.signature, 'base64'));
+  console.log(req.body)
+  console.log("Enroll from: " + req.body.identity) 
+  identity = req.body.identity.split("@")
+  // Before we enroll we want to check the device follows our methods of verifying identity 
+  pub_key = Buffer.from(req.body.public_key, "base64").toString()
+  KeyString = pub_key.split('RSA ').join('')
+  let KeyObject = crypto.createPublicKey({ key: KeyString, format: 'pem' });
+  const result = crypto.verify(
+  'rsa-sha256',
+  new TextEncoder().encode(req.body.identity),
+  {
+          key: KeyString,
+          padding: crypto.constants.RSA_PKCS1_PSS_PADDING
+  },
+  Buffer.from(req.body.signature, 'base64'));
 
-    if (!result) {
-      console.warn('Signature is NOT valid. A device has attempted to enroll that cannot verify its self.');
-            res.status(401).json({"error":"signature is invalid"})
-      return;
-    } else if (result) {
-      console.log('Signature is valid. continuing');
-    } else {
-      console.error("Result is not true or false, how does this work?")
-            res.status(401).json({"error":"signature is invalid"})
-            return;
-    }
+  if (!result) {
+    console.warn('Signature is NOT valid. A device has attempted to enroll that cannot verify its self.');
+    res.status(401).json({"error":"signature is invalid"})
+    return;
+  } else if (result) {
+    console.log('Signature is valid. continuing');
+  } else {
+    console.error("Result is not true or false, how does this work?")
+    res.status(401).json({"error":"signature is invalid"})
+    return;
+  }
+//check if unit is already in our database
+  connection.query('SELECT * from units WHERE identity = ?',
+  [identity[1],identity[0]],
+  function(err, results, fields) {
+    if (err) {
+      console.log(err)
+      res.status(500).json({"error":"Internal Server Error"})
+      return
+      } 
+        if (results.length == 0) {
+          console.log("Enrolling New")
+          let country = "XX"
+          let addr = null
+          let data = {}
 
-    
-    //check if unit is already in our database
-    
-    connection.query('SELECT * from units WHERE identity = ?',
-    [identity[1],identity[0]],
-        function(err, results, fields) {
-            if (err) {
-                console.log(err)
-                res.status(500).json({"error":"Internal Server Error"})
-                return
-            } 
-            if (results.length == 0) {
-                console.log("Enrolling New")
-                let country = "XX"
-                let addr = null
-                let data = {}
-
-                pub_key = Buffer.from(req.body.public_key, "base64").toString();
-                if (req && req.headers && req.headers['x-forwarded-for']) {
-                  addr = req.headers['x-forwarded-for'];
-                } else {
-                  // Handle the case where req or req.headers or req.headers['x-forwarded-for'] is null or undefined
-                  console.warn("Error: X-Forwarded-For header is missing or undefined");
-                  addr = null; 
-                }
+          pub_key = Buffer.from(req.body.public_key, "base64").toString();
+          if (req && req.headers && req.headers['x-forwarded-for']) {
+            addr = req.headers['x-forwarded-for'];
+            } else {
+ // Handle the case where req or req.headers or req.headers['x-forwarded-for'] is null or undefined
+            console.warn("Error: X-Forwarded-For header is missing or undefined");
+              addr = null; 
+              }
                 if (req && req.headers && req.headers['cf-ipcountry']) {
                   country = req.headers['cf-ipcountry'];
                 } else {
@@ -461,46 +466,41 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
                   console.warn("Error: data is missing or undefined");
                   data = {}
                 }
-
                 connection.query('INSERT INTO units (name,identity,public_key,address,country,data) VALUES (?,?,?,?,?,?)',
                 [identity[0], identity[1],pub_key,addr,country,JSON.stringify(data)],
                 function(err, results, fields) {
-                    res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
-                    console.log("Enrolled new")
-                    return
+                  res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
+                  console.log("Enrolled new")
+                  return
                 }
             );
-            } else if (results.length == 1) {
-
-                data = {}
-                if (req && req.body && req.body.data) {
-                  data = req.body.data
-                } else {
-                  console.error("Error: data is missing or undefined");
-                  data = {}
+        } else if (results.length == 1) {
+          data = {}
+          if (req && req.body && req.body.data) {
+            data = req.body.data
+          } else {
+            console.error("Error: data is missing or undefined");
+            data = {}
+          }
+            connection.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1',
+            [JSON.stringify(data),identity[0], identity[1]],
+            function(err, results, fields) {
+              console.error(err)
+                if (err) {
+                  console.error(err)
+                  res.status(500).json({"error":"Internal Server Error"})
+                  return
                 }
-                connection.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1',
-                [JSON.stringify(data),identity[0], identity[1]],
-                function(err, results, fields) {
-                    console.error(err)
-                    if (err) {
-                      console.error(err)
-                      res.status(500).json({"error":"Internal Server Error"})
-                      return
-                    }
-                    console.log("Updating enrollee: " + identity[1])
-                    return
-                })
-                res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
-              } else if (results.length > 1) {
+                  console.log("Updating enrollee: " + identity[1])
+                  return
+              })
+              res.status(200).send(JSON.stringify({ "token": updateToken(identity,results.insertId) }));
+        } else if (results.length > 1) {
                 console.log('Tried to enroll, but database return error or more than 1 match')
                 res.status(500).json({"error":"Internal Server Error"})
                 return;
               }
-        })
-    
-
-
+  })
 })
 //send APs Posts
 app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
@@ -517,6 +517,8 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
     function(err, results, fields) {
       if (err) {
         console.log(err)
+        res.status(500).json({"error":"Internal Server Error"})
+        return;
       }
       // If results is 0, it exists, so send OK
       if (results.length == 1) {
@@ -533,6 +535,7 @@ app.post('/api/v1/unit/report/ap', toJson, authenticate, (req, res) => {
             if (err) {
               // Handle the error, but don't send a response here
               console.error(err);
+              res.status(500).json({"error":"Internal Server Error"})
               return;
             }
             // Send a response when the insertion is successful
@@ -559,6 +562,8 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
     function(err, results, fields) {
       if (err) {
         console.log(err)
+        res.status(500).json({"error":"Internal Server Error"})
+        return;
       }
       // If results is 0, it exists, so send OK
       if (results.length == 1) {
@@ -575,6 +580,7 @@ app.post('/api/v1/unit/report/aps', toJson, authenticate, (req, res) => {
             if (err) {
               // Handle the error, but don't send a response here
               console.error(err);
+              res.status(500).json({"error":"Internal Server Error"})
               return;
             }
             // Send a response when the insertion is successful
