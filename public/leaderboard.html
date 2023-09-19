@@ -8,6 +8,7 @@
         <script>
             $(document).ready(function() {
                 $.get("https://api.opwngrid.xyz/api/v1/leaders", function(data) {
+                    for (let i = 0; i <= data.length; i++) {
                     let leaderDiv = document.getElementById("leaders");
                     let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                     let pos = 1
@@ -15,6 +16,7 @@
                     let aHref = `<a href="/search/${data[i].identity}">${data[i].name}</a>`
                     h3.innerHTML = `${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
                     leaderDiv.appendChild(h3)
+                    }
             });
             $.get("https://api.opwngrid.xyz/api/v1/total/aps", function(data2) {
                 document.getElementById("landString2").innerText=`${data2.total} total APs reported`;
