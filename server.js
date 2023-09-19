@@ -189,7 +189,7 @@ app.get('/api/v1/recent', (req, res) => {
 
 app.get('/api/v1/leaders', (req, res) => {
   console.log("Got: Leaders")
-  connection.query('SELECT u.name, a.identity,u.country, COUNT(DISTINCT a.essid) AS amount FROM units u JOIN aps a ON u.identity = a.identity GROUP BY u.name, a.identity ORDER BY amount DESC LIMIT 10;',
+  connection.query('SELECT u.country, u.name, a.identity, COUNT(DISTINCT a.essid) AS amount FROM units u JOIN aps a ON u.identity = a.identity GROUP BY u.country, u.name, a.identity ORDER BY amount DESC LIMIT 10;',
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})
@@ -248,12 +248,8 @@ app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
         res.status(200).json(messages)
         return;
       })
-    console.warn("An error executing db query occured")
-    res.status(500).json({"error":"Internal Server Error"})
     return
     })
-  console.warn("An error executing db query occured")
-  res.status(500).json({"error":"Internal Server Error"})
   return
 })
 
