@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+
+
+        <script>
+            $(document).ready(function() {
+                $.get("https://api.opwngrid.xyz/api/v1/leaders", function(data) {
+                    let leaderDiv = document.getElementById("leaders");
+                    let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
+                    let pos = 1
+                    let h3 = document.createElement("h3")
+                    let aHref = `<a href="/search/${data[i].identity}">${data[i].name}</a>`
+                    h3.innerHTML = `${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
+                    leaderDiv.appendChild(h3)
+            });
+            $.get("https://api.opwngrid.xyz/api/v1/total/aps", function(data2) {
+                document.getElementById("landString2").innerText=`${data2.total} total APs reported`;
+                console.log(data2)
+            });
+        });
+        </script>
+    </head>
+    <body style="font-family: Roboto;">
+        <h1>Welcome</h1>
+        <h2>home   <a href="/convert">convert</a>   <a href="search/">search</a>   <a href="leaderboard/">leaderboard</a></h2>
+        <body>
+            <form id="search-form">
+                <input type="text" id="search-input" placeholder="Search by fingerprint...">
+                <button type="button" id="search-button">Search</button>
+            </form>
+            <script>
+                // Get references to the input and button elements
+                const searchInput = document.getElementById('search-input');
+                const searchButton = document.getElementById('search-button');
+        
+                // Add a click event listener to the button
+                searchButton.addEventListener('click', function () {
+                    // Get the text from the input
+                    const searchText = searchInput.value.trim();
+        
+                    // Check if the input is not empty
+                    if (searchText) {
+                        // Redirect to /search/ with the search query appended
+                        window.location.href = `/search/${encodeURIComponent(searchText)}`;
+                    }
+                });
+            </script>
+            <h2 id="landString"></h2>
+            <h2 id="landString2"></h2>
+            <h2 id="leadersString">Top 10 units with the most reports</h2>
+            <div id="leaders"></div>
+    </body>
+
+
+</html>

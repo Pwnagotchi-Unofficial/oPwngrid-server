@@ -138,11 +138,11 @@ app.get('/api/v1/uptime', (req,res) => {
 })
 app.get('/api/v1/units', (req, res) => {
     res.send('Custom API for a new pwn system')
-  })
+})
 
 app.get('/api/v1/units/by_country', (req, res) => {
     res.send('Custom API for a new pwn system')
-  })
+})
 
   app.get('/api/v1/total', (req, res) => {
     
@@ -173,6 +173,20 @@ app.get('/api/v1/total/aps', (req, res) => {
 app.get('/api/v1/recent', (req, res) => {
   
   connection.query('SELECT name,data,created_at,country,identity FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10',
+  function(err, results, fields) {
+    if (err) {
+      res.status(500).json({"error":"Internal Server Error"})
+      console.log(err)
+      return;
+    }
+    res.send(results)
+  })
+  return
+})
+
+app.get('/api/v1/leaders', (req, res) => {
+  console.log("Got: Leaders")
+  connection.query('SELECT u.name, a.identity, COUNT(DISTINCT a.essid) AS amount FROM units u JOIN aps a ON u.identity = a.identity GROUP BY u.name, a.identity ORDER BY amount DESC LIMIT 10;',
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})
@@ -231,8 +245,12 @@ app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
         res.status(200).json(messages)
         return;
       })
+    console.warn("An error executing db query occured")
+    res.status(500).json({"error":"Internal Server Error"})
     return
     })
+  console.warn("An error executing db query occured")
+  res.status(500).json({"error":"Internal Server Error"})
   return
 })
 
