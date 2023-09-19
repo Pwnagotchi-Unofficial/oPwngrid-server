@@ -129,6 +129,9 @@ app.get('/convert', (req, res) => {
 app.get('/css/:file', (req, res) => {
   res.sendFile(__dirname + `/public/css/${req.params.file}`);
 })
+app.get('/leaderboard', (req, res) => {
+  res.sendFile(__dirname + `/public/leaderboard.html`);
+})
 
 //----------------------------------------------------------------------------
 //Start of statistic APIs
