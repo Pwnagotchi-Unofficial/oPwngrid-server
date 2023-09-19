@@ -189,7 +189,7 @@ app.get('/api/v1/recent', (req, res) => {
 
 app.get('/api/v1/leaders', (req, res) => {
   console.log("Got: Leaders")
-  connection.query('SELECT u.country, u.name, a.identity, COUNT(DISTINCT a.essid) AS amount FROM units u JOIN aps a ON u.identity = a.identity GROUP BY u.country, u.name, a.identity ORDER BY amount DESC LIMIT 10;',
+  connection.query('SELECT u.country, u.name, a.identity, COUNT(DISTINCT a.identity) AS amount FROM units u JOIN aps a ON u.identity = a.identity GROUP BY u.country, u.name, a.identity ORDER BY amount DESC LIMIT 10;',
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})
