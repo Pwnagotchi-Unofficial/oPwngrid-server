@@ -260,8 +260,8 @@ app.get('/api/v1/search/:fingerprint', authenticate, (req, res) => {
   //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
   console.log('Got web search for ' + req.params.fingerprint)
   //Query fingerprint via mysql
-  connection.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1;  ',
-  [req.params.fingerprint],
+  connection.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1',
+  [req.params.fingerprint,req.params.fingerprint],
   function(err, results, fields) {
     if (err) {
       console.log(err)
