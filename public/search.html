@@ -71,9 +71,9 @@ else {
                     let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                     data = JSON.parse(data)
                     data.data = JSON.parse(data.data)
-                    if (data.name && data.data.advertisement.face) {
+                    if (data.name && data.data.advertisement) {
                     document.getElementById("userStringName").innerText=`${data.name}        ${data.data.advertisement.face}`;
-                    } if (data.name) {
+                    } else if (data.name) {
                         document.getElementById("userStringName").innerText=`${data.name}`
                     }
                     if (data.updated_at && data.data.brain) {
@@ -96,7 +96,7 @@ else {
                         let now = new Date()
 
                         let timeNow = now.getTime()
-                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${regionNames.of(data.country)}. It reported ${data.data.advertisement.pwnd_tot} pwned networks so far.`;
+                        document.getElementById("userString").innerText=`Unit ${data.name} registered ${timeDifference(timeNow, MsCreatedAt)} from ${regionNames.of(data.country)}. It reported ${data.amount} pwned networks so far.`;
 
                     }
                     let h3 = document.createElement("h3")
