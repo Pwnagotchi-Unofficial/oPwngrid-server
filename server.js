@@ -189,7 +189,7 @@ app.get('/api/v1/recent', (req, res) => {
 
 app.get('/api/v1/leaders', (req, res) => {
   console.log("Got: Leaders")
-  connection.query('SELECT u.country, u.name, a.identity, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity GROUP BY u.country, u.name, a.identity ORDER BY amount DESC LIMIT 10;',
+  connection.query('SELECT u.country, u.name, a.identity, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) GROUP BY u.country, u.name, a.identity ORDER BY amount DESC LIMIT 10;',
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})
@@ -433,7 +433,7 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
   }
 //check if unit is already in our database
   connection.query('SELECT * from units WHERE identity = ?',
-  [identity[1],identity[0]],
+  [identity[1]],
   function(err, results, fields) {
     if (err) {
       console.log(err)
@@ -450,7 +450,6 @@ app.post('/api/v1/unit/enroll', toJson, (req,res) => {
           if (req && req.headers && req.headers['x-forwarded-for']) {
             addr = req.headers['x-forwarded-for'];
             } else {
- // Handle the case where req or req.headers or req.headers['x-forwarded-for'] is null or undefined
             console.warn("Error: X-Forwarded-For header is missing or undefined");
               addr = null; 
               }
