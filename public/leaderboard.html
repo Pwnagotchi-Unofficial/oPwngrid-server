@@ -18,8 +18,15 @@
                         let h3 = document.createElement("h3")
                         let aHref = `<a href="/search/${data[i].identity}">${data[i].name}</a>`
 
-                        h3.innerHTML = `${pos}. ${data3[i].data.advertisement.face} ${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
-                        leaderDiv.appendChild(h3)
+
+
+                        if (data3[i].data && data3[i].data.advertisement) {
+                            h3.innerHTML = `${data3[i].data.advertisement.face}   ${aHref} was created ${timeDifference(timeNow, MsCreatedAt)} from the country of ${regionNames.of(data3[i].country)}`  //create string format of recently added devices
+                            recentDiv.appendChild(h3)
+                        } else {
+                            h3.innerHTML = `${pos}. ${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
+                            leaderDiv.appendChild(h3)
+                        }
                         pos++;
                     }
             });
