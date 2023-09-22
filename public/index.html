@@ -74,7 +74,7 @@ else {
                 let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                 let recentDiv = document.getElementById("recent");
                 for (let i = 0; i <= data3.length; i++) {
-
+                    data3[i].data = JSON.parse(data3[i].data)
                     let dateCreated = new Date(data3[i].created_at);
 
                     dateCreated.toLocaleString('default', { timeZoneName: 'short' });
