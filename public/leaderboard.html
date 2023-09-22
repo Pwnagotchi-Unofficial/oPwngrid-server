@@ -18,7 +18,7 @@
                         let h3 = document.createElement("h3")
                         let aHref = `<a href="/search/${data[i].identity}">${data[i].name}</a>`
 
-
+                        console.log(data[i])
 
                         if (data[i].data && data[i].data.advertisement) {
                             h3.innerHTML = `${data[i].data.advertisement.face}   ${aHref} was created ${timeDifference(timeNow, MsCreatedAt)} from the country of ${regionNames.of(data3[i].country)}`  //create string format of recently added devices
