@@ -17,7 +17,7 @@
 
                         let h3 = document.createElement("h3")
                         let aHref = `<a href="/search/${data[i].identity}">${data[i].name}</a>`
-                        h3.innerHTML = `${pos}. ${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
+                        h3.innerHTML = `${pos}. ${data3.data[i].advertisement.face} ${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
                         leaderDiv.appendChild(h3)
                         pos++;
                     }
