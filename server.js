@@ -98,7 +98,7 @@ app.get('*', function(req, res, next){
       return;
     }
   } else if (req.headers.host == 'api.opwngrid.xyz') {
-    if (req.url.includes("/api/")) {
+    if (req.url.includes("api/")) {
       next(); 
       return
     } else {
@@ -210,8 +210,14 @@ app.get('/api/v1/leaders', (req, res) => {
 
 app.get('/api/statisics/apsByDay', (req, res) => {
   console.log("Got: /api/statisics/apsByDay")
+  if (!req.params.days || !isNaN(req.params.days)) {
+    days = 365
+  } else {
+    days = req.params.days
+  }
+
   connection.query('SELECT DATE_FORMAT(time, \'%Y-%m-%d\') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?', 
-  [req.params.days],
+  [days],
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})
