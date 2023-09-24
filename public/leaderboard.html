@@ -44,6 +44,7 @@
             data.forEach(element => {
                 unit.push(element.name)
                 amount.push(element.amount)
+                console.log("#" + element.identity.slice(0,3) + element.identity.slice(-3))
                 colour.push("#" + element.identity.slice(0,3) + element.identity.slice(-3))
             });
 
