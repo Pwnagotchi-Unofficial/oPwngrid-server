@@ -44,10 +44,10 @@
             data.forEach(element => {
                 unit.push(element.name)
                 amount.push(element.amount)
-                console.log("#" + element.identity.slice(0,3) + element.identity.slice(-3))
+                
                 colour.push("#" + element.identity.slice(0,3) + element.identity.slice(-3))
             });
-
+            console.log(colour)
             new Chart(LeadersChart, {
               type: 'bar',
               data: {
@@ -55,6 +55,7 @@
                 datasets: [{
                   label: '# of APs reported by users',
                   data: amount,
+                  backgroundColor:colour,
                   borderWidth: 1
                 }]
               },
