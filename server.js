@@ -202,6 +202,7 @@ app.get('/api/v1/leaders', (req, res) => {
       console.log(err)
       return;
     }
+    console.log(results)
     res.send(results[0])
   })
   return
