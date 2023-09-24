@@ -1,9 +1,8 @@
 <html>
     <head>
         <title>oPwngrid: Leaderboard</title>
-        <script
-            src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             $(document).ready(function() {
 
@@ -14,7 +13,7 @@
 
                 $.get("https://api.opwngrid.xyz/api/statistics/leaders?units=100", function(data) {
                     let pos = 1
-                    for (let i = 0; i < 2; i++) {
+                    for (let i = 0; i < 3; i++) {
                         //data[i].data = JSON.parse(data[i].data)
                         let leaderDiv = document.getElementById("leaders");
                         let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
