@@ -11,19 +11,19 @@
             //Client side will do most of the formatting of data where the server will only do updates to its data every 10 minutes, this will decrease the work of the server
 
         $(document).ready(function() {
-            $.get(`https://api.opwngrid.xyz/api/statistics/builds`, function(data) {
+            $.get(`https://api.opwngrid.xyz/api/statistics/`, function(data) {
             const ctx = document.getElementById('buildsChart');
             //FORMAT DATA
 
-
+                console.log(data)
 
             new Chart(ctx, {
               type: 'bar',
               data: {
-                labels: buildStats.types,
+                labels: data.ApsByDay.day,
                 datasets: [{
-                  label: '# of Builds',
-                  data: buildStats.data,
+                  label: '# of APs reported per day',
+                  data: data.ApsByDay.reported,
                   borderWidth: 1
                 }]
               },
