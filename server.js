@@ -207,7 +207,6 @@ app.get('/api/v1/leaders', (req, res) => {
   return
 })
 //Start of stats page statistics
-
 app.get('/api/statistics/apsByDay', (req, res) => {
   console.log("Got: /api/statisics/apsByDay Called")
   if (!req.params.days || !isNaN(req.params.days)) {
@@ -217,6 +216,27 @@ app.get('/api/statistics/apsByDay', (req, res) => {
   }
 
   connection.query('SELECT DATE_FORMAT(time, \'%Y-%m-%d\') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?', 
+  [days],
+  function(err, results, fields) {
+    if (err) {
+      res.status(500).json({"error":"Internal Server Error"})
+      console.log(err)
+      return;
+    }
+    res.send(results)
+  })
+  return
+})
+
+app.get('/api/statistics/messagesByDay', (req, res) => {
+  console.log("Got: /api/statisics/apsByDay Called")
+  if (!req.params.days || !isNaN(req.params.days)) {
+    days = 365
+  } else {
+    days = req.params.days
+  }
+
+  connection.query('SELECT DATE_FORMAT(created_at, \'%Y-%m-%d\') AS day, COUNT(ID) AS messages FROM messages GROUP BY day ORDER BY day DESC LIMIT ?', 
   [days],
   function(err, results, fields) {
     if (err) {

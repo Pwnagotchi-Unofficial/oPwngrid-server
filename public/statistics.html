@@ -12,7 +12,7 @@
 
         $(document).ready(function() {
             $.get(`https://api.opwngrid.xyz/api/statistics/apsByDay?days=356`, function(data) {
-            const ctx = document.getElementById('buildsChart');
+            const ctx = document.getElementById('APsChart');
             //FORMAT DATA
             days = []
             amount = []
@@ -28,6 +28,38 @@
                 labels: days,
                 datasets: [{
                   label: '# of APs reported per day',
+                  data: amount,
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                scales: {
+                  y: {
+                    beginAtZero: true
+                  }
+                }
+              }
+            });
+
+            })
+
+            $.get(`https://api.opwngrid.xyz/api/statistics/messagesByDay?days=356`, function(data) {
+            const ctx = document.getElementById('APsChart');
+            //FORMAT DATA
+            days = []
+            amount = []
+
+            data.forEach(element => {
+                days.push(element.day)
+                amount.push(element.messages)
+            });
+
+            new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: days,
+                datasets: [{
+                  label: '# of messages sent per day',
                   data: amount,
                   borderWidth: 1
                 }]
@@ -81,6 +113,8 @@
                 hopefully more user suggested information</h2>
 
             <div style="width: 60%">
+                <canvas id="APsChart"></canvas>
+                <span></span>
                 <canvas id="buildsChart"></canvas>
             </div>
 
