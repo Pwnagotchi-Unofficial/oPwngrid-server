@@ -124,7 +124,7 @@ else {
                 });
             </script>
     </head>
-    <body style="font-family: Roboto;">
+    <body style="font-family: Roboto; " class="p-3 m-0 border-0 bd-example m-0 border-0">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
               <a class="navbar-brand" href="#"></a>
@@ -140,7 +140,7 @@ else {
             </div>
           </nav>
 
-          <nav class="navbar navbar-expand-lg bg-body-tertiary">
+          <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
             <div class="container-fluid">
               <a class="navbar-brand" href="#">oPwngrid</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -165,8 +165,12 @@ else {
                     </li>
                 </ul>
                 <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <input class="form-control me-2" type="search" placeholder="Search by fingerprint..." aria-label="Search" id="search-input">
+                    <button class="btn btn-outline-success" type="submit" id="search-button">Search</button>
+                  </form>
+                  <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" >
+                    <button class="btn btn-outline-success" type="submit" >Search</button>
                   </form>
               </div>
             </div>
