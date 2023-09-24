@@ -210,7 +210,8 @@ app.get('/api/v1/leaders', (req, res) => {
 
 app.get('/api/statisics', (req, res) => {
   console.log("Got: /api/statisics")
-  connection.query('SELECT DATE_FORMAT(time, \'%Y-%m-%d\') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT 100;',
+  connection.query('SELECT DATE_FORMAT(time, \'%Y-%m-%d\') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?', 
+  [req.params.days],
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})
