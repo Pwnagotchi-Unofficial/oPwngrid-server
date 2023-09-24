@@ -30,17 +30,12 @@ const connection = DBconnect()
 
 //Connect to DB and kill if it fails for any reason
 async function DBconnect() {
-try {
     return connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       database: process.env.DB,
       password: process.env.DB_PASS
     });
-} catch (err) {
-  console.log("FATAL: " + err)
-  process.kill(process.pid, 'SIGINT');
-}
 }
 
 
