@@ -14,16 +14,21 @@
             $.get(`https://api.opwngrid.xyz/api/statisics/apsByDay?days=356`, function(data) {
             const ctx = document.getElementById('buildsChart');
             //FORMAT DATA
+            days = []
+            amount = []
 
-            console.log(data)
+            data.forEach(element => {
+                days.push(element.day)
+                amount.push(element.reported)
+            });
 
             new Chart(ctx, {
               type: 'bar',
               data: {
-                labels: data.ApsByDay.day,
+                labels: days,
                 datasets: [{
                   label: '# of APs reported per day',
-                  data: data.ApsByDay.reported,
+                  data: amount,
                   borderWidth: 1
                 }]
               },
