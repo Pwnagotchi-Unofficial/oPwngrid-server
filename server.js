@@ -25,17 +25,14 @@ const MS_PER_MINUTE = 60000;
 
 let refreshBuilds = null
 
-const connection = null
 //Connect to DB and kill if it fails for any reason
 try {
-  (async () => {
     connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       database: process.env.DB,
       password: process.env.DB_PASS
     });
-  })();
 } catch (err) {
   console.log("FATAL: " + err)
   process.kill(process.pid, 'SIGINT');
