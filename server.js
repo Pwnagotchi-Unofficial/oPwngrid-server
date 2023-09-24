@@ -89,7 +89,6 @@ function authenticate(req, res, next) {
 }
 
 app.get('*', function(req, res, next){ 
-  console.log(req.headers.host)
   if(req.headers.host == 'opwngrid.xyz') { //if it's a sub-domain
     if (req.url.includes("/api/")) {
       res.send("API not here")
@@ -99,8 +98,7 @@ app.get('*', function(req, res, next){
       return;
     }
   } else if (req.headers.host == 'api.opwngrid.xyz') {
-    console.log(req.url.includes("/api/v1") || req.url.includes("/api/"))
-    if (req.url.includes("/api/v1") || req.url.includes("/api/")) {
+    if (req.url.includes("/api/")) {
       next(); 
       return
     } else {
@@ -208,9 +206,9 @@ app.get('/api/v1/leaders', (req, res) => {
   })
   return
 })
-//Start of stats page statisics
+//Start of stats page statistics
 
-app.get('/api/statisics/apsByDay', (req, res) => {
+app.get('/api/statistics/apsByDay', (req, res) => {
   console.log("Got: /api/statisics/apsByDay Called")
   if (!req.params.days || !isNaN(req.params.days)) {
     days = 365
