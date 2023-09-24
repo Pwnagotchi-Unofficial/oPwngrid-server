@@ -208,8 +208,8 @@ app.get('/api/v1/leaders', (req, res) => {
 })
 //Start of stats page statisics
 
-app.get('/api/statisics', (req, res) => {
-  console.log("Got: /api/statisics")
+app.get('/api/statisics/apsByDay', (req, res) => {
+  console.log("Got: /api/statisics/apsByDay")
   connection.query('SELECT DATE_FORMAT(time, \'%Y-%m-%d\') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?', 
   [req.params.days],
   function(err, results, fields) {
