@@ -89,6 +89,7 @@ function authenticate(req, res, next) {
 }
 
 app.get('*', function(req, res, next){ 
+  console.log(req.headers.host)
   if(req.headers.host == 'opwngrid.xyz') { //if it's a sub-domain
     if (req.url.includes("/api/")) {
       res.send("API not here")
