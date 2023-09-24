@@ -203,7 +203,7 @@ app.get('/api/v1/leaders', (req, res) => {
       return;
     }
     console.log(results)
-    res.send(results[0])
+    res.send(JSON.stringify(results))
   })
   return
 })
