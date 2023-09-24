@@ -70,7 +70,7 @@ else {
                     let body = document.getElementById("body");
                     let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
                     data = JSON.parse(data)
-                    data.data = JSON.parse(data.data)
+                    //data.data = JSON.parse(data.data)
                     if (data.name && data.data.advertisement) {
                     document.getElementById("userStringName").innerText=`${data.name}        ${data.data.advertisement.face}`;
                     } else if (data.name) {
