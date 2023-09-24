@@ -98,7 +98,7 @@ app.get('*', function(req, res, next){
       return;
     }
   } else if (req.headers.host == 'api.opwngrid.xyz') {
-    if (req.url.includes("api/")) {
+    if (req.url.includes("/api/v1") || req.url.includes("/api/")) {
       next(); 
       return
     } else {
@@ -209,7 +209,7 @@ app.get('/api/v1/leaders', (req, res) => {
 //Start of stats page statisics
 
 app.get('/api/statisics/apsByDay', (req, res) => {
-  console.log("Got: /api/statisics/apsByDay")
+  console.log("Got: /api/statisics/apsByDay Called")
   if (!req.params.days || !isNaN(req.params.days)) {
     days = 365
   } else {
