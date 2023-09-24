@@ -40,7 +40,7 @@ SqlString.escape = function escape(val, stringifyObjects, timeZone) {
     case 'boolean': return (val) ? 'true' : 'false';
     case 'number': return val + '';
     case 'object':
-      if (val instanceof Date) {
+      if (Object.prototype.toString.call(val) === '[object Date]') {
         return SqlString.dateToString(val, timeZone || 'local');
       } else if (Array.isArray(val)) {
         return SqlString.arrayToList(val, timeZone);
@@ -78,7 +78,7 @@ SqlString.format = function format(sql, values, stringifyObjects, timeZone) {
     return sql;
   }
 
-  if (!(values instanceof Array || Array.isArray(values))) {
+  if (!Array.isArray(values)) {
     values = [values];
   }
 
