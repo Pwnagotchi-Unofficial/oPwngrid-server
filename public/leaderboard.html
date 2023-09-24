@@ -18,8 +18,6 @@
                         let h3 = document.createElement("h3")
                         let aHref = `<a href="/search/${data[i].identity}">${data[i].name}</a>`
 
-                        console.log(data[i])
-
                         if (data[i].data && data[i].data.advertisement) {
                             h3.innerHTML = `${pos}. ${data[i].data.advertisement.face} ${aHref} has a total of ${data[i].amount} reported APs from the country of ${regionNames.of(data[i].country)}`  //create string format of recently added devices
                             leaderDiv.appendChild(h3)
@@ -38,8 +36,8 @@
         </script>
     </head>
     <body style="font-family: Roboto;">
-        <h1>Welcome</h1>
-        <h2><a href="../">home</a>   <a href="/convert">convert</a>   <a href="search/">search</a>   leaderboard</h2>
+        <h1>Leaderboard</h1>
+        <h2><a href="../">home</a>   <a href="/convert">convert</a>   <a href="search/">search</a>   leaderboard    <a href="/statistics">statistics</a></h2>
         <body>
             <form id="search-form">
                 <input type="text" id="search-input" placeholder="Search by fingerprint...">
