@@ -98,6 +98,7 @@ app.get('*', function(req, res, next){
       return;
     }
   } else if (req.headers.host == 'api.opwngrid.xyz') {
+    console.log(req.url.includes("/api/v1") || req.url.includes("/api/"))
     if (req.url.includes("/api/v1") || req.url.includes("/api/")) {
       next(); 
       return
