@@ -12,7 +12,7 @@
 
         $(document).ready(function() {
             $.get(`https://api.opwngrid.xyz/api/statistics/apsByDay?days=356`, function(data) {
-            const ctx = document.getElementById('APsChart');
+            const APsChart = document.getElementById('APsChart');
             //FORMAT DATA
             days = []
             amount = []
@@ -22,7 +22,7 @@
                 amount.push(element.reported)
             });
 
-            new Chart(ctx, {
+            new Chart(APsChart, {
               type: 'line',
               data: {
                 labels: days,
@@ -44,7 +44,7 @@
             })
 
             $.get(`https://api.opwngrid.xyz/api/statistics/messagesByDay?days=356`, function(data) {
-            const ctx = document.getElementById('APsChart');
+            const messagesChart = document.getElementById('messagesChart');
             //FORMAT DATA
             days = []
             amount = []
@@ -54,7 +54,7 @@
                 amount.push(element.messages)
             });
 
-            new Chart(ctx, {
+            new Chart(messagesChart, {
               type: 'line',
               data: {
                 labels: days,
@@ -115,7 +115,7 @@
             <div style="width: 60%">
                 <canvas id="APsChart"></canvas>
                 <span></span>
-                <canvas id="buildsChart"></canvas>
+                <canvas id="messagesChart"></canvas>
             </div>
 
         </body>
