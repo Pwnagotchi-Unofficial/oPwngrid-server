@@ -1,16 +1,20 @@
 <html>
     <head>
         <title>oPwngrid: Leaderboard</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-
-
+        <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
         <script>
             $(document).ready(function() {
-                $.get("https://api.opwngrid.xyz/api/v1/leaders", function(data) {
+
+                $.get("https://api.opwngrid.xyz/api/v1/total/aps", function(data2) {
+                document.getElementById("landString2").innerText=`${data2.total} total APs reported`;
+                console.log(data2)
+                });
+
+                $.get("https://api.opwngrid.xyz/api/statistics/leaders?units=100", function(data) {
                     let pos = 1
-                    for (let i = 0; i <= data.length; i++) {
+                    for (let i = 0; i < 2; i++) {
                         //data[i].data = JSON.parse(data[i].data)
                         let leaderDiv = document.getElementById("leaders");
                         let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
@@ -27,20 +31,55 @@
                         }
                         pos++;
                     }
+                });
+
+
+            
+
+            $.get(`https://api.opwngrid.xyz/api/statistics/leaders?days=100`, function(data) {
+            const LeadersChart = document.getElementById('LeadersChart');
+            //FORMAT DATA
+            unit = []
+            amount = []
+
+            data.forEach(element => {
+                unit.push(element.unit)
+                amount.push(element.reported)
             });
-            $.get("https://api.opwngrid.xyz/api/v1/total/aps", function(data2) {
-                document.getElementById("landString2").innerText=`${data2.total} total APs reported`;
-                console.log(data2)
+
+            new Chart(LeadersChart>, {
+              type: 'bar',
+              data: {
+                labels: unit,
+                datasets: [{
+                  label: '# of APs reported by users',
+                  data: amount,
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                scales: {
+                  y: {
+                    beginAtZero: true
+                  }
+                }
+              }
             });
+
+            })
+
+
         });
         </script>
     </head>
     <body style="font-family: Roboto;">
         <h1>Leaderboard</h1>
-        <h2><a href="../">home</a>   <a href="/convert">convert</a>   <a href="search/">search</a>   leaderboard    <a href="/statistics">statistics</a></h2>
+        <h2><a href="../">home</a> <a href="/convert">convert</a> <a
+                href="search/">search</a> leaderboard <a href="/statistics">statistics</a></h2>
         <body>
             <form id="search-form">
-                <input type="text" id="search-input" placeholder="Search by fingerprint...">
+                <input type="text" id="search-input"
+                    placeholder="Search by fingerprint...">
                 <button type="button" id="search-button">Search</button>
             </form>
             <script>
@@ -62,9 +101,11 @@
             </script>
             <h2 id="landString"></h2>
             <h2 id="landString2"></h2>
-            <h2 id="leadersString">Top 10 units with the most reports</h2>
+            <h2 id="leadersString">Top 3 units with the most reports</h2>
             <div id="leaders"></div>
-    </body>
+            <div style="width: 60%">
+                <canvas id="LeadersChart"></canvas>
+            </div>
+        </body>
 
-
-</html>
+    </html>

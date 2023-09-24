@@ -193,19 +193,7 @@ app.get('/api/v1/recent', (req, res) => {
   return
 })
 
-app.get('/api/v1/leaders', (req, res) => {
-  console.log("Got: Leaders")
-  connection.query('SELECT u.country, u.name, a.identity, u.data, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) GROUP BY u.country, u.name, a.identity, u.data ORDER BY amount DESC LIMIT 10;',
-  function(err, results, fields) {
-    if (err) {
-      res.status(500).json({"error":"Internal Server Error"})
-      console.log(err)
-      return;
-    }
-    res.send(results)
-  })
-  return
-})
+
 //Start of stats page statistics
 app.get('/api/statistics/apsByDay', (req, res) => {
   console.log("Got: /api/statisics/apsByDay Called")
@@ -248,6 +236,22 @@ app.get('/api/statistics/messagesByDay', (req, res) => {
   })
   return
 })
+
+app.get('/api/statistics/leaders', (req, res) => {
+  console.log("Got: Leaders")
+  connection.query('SELECT u.country, u.name, a.identity, u.data, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) GROUP BY u.country, u.name, a.identity, u.data ORDER BY amount DESC LIMIT 10;',
+  function(err, results, fields) {
+    if (err) {
+      res.status(500).json({"error":"Internal Server Error"})
+      console.log(err)
+      return;
+    }
+    res.send(results)
+  })
+  return
+})
+
+
 //End of statisics
 
 app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {
