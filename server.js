@@ -239,7 +239,15 @@ app.get('/api/statistics/messagesByDay', (req, res) => {
 
 app.get('/api/statistics/leaders', (req, res) => {
   console.log("Got: Leaders")
-  connection.query('SELECT u.country, u.name, a.identity, u.data, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) GROUP BY u.country, u.name, a.identity, u.data ORDER BY amount DESC LIMIT 10;',
+
+  if (!req.params.units || !isNaN(req.params.units)) {
+    units = 100
+  } else {
+    units = req.params.units
+  }
+
+  connection.query('SELECT u.country, u.name, a.identity, u.data, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) GROUP BY u.country, u.name, a.identity, u.data ORDER BY amount DESC LIMIT ?;',
+  [units],
   function(err, results, fields) {
     if (err) {
       res.status(500).json({"error":"Internal Server Error"})

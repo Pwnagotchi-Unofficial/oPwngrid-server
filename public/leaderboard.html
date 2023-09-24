@@ -42,8 +42,8 @@
             amount = []
 
             data.forEach(element => {
-                unit.push(element.unit)
-                amount.push(element.reported)
+                unit.push(element.name)
+                amount.push(element.amount)
             });
 
             new Chart(LeadersChart, {
