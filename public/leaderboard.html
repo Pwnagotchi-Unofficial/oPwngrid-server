@@ -44,7 +44,7 @@
             data.forEach(element => {
                 unit.push(element.name)
                 amount.push(element.amount)
-                colour.push("#" + data.identity.slice(0,3) + data.identity.slice(-3))
+                colour.push("#" + element.identity.slice(0,3) + element.identity.slice(-3))
             });
 
             new Chart(LeadersChart, {
