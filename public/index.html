@@ -1,11 +1,18 @@
 <html>
     <head>
         <title>oPwngrid: Home</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-        
-        
+        <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous">
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
         <script>
 function timeDifference(current, previous) {
 
@@ -99,45 +106,7 @@ else {
             });
         });
         </script>
-    </head>
-    <body style="font-family: Roboto;">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="#">oPwngrid</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/convert">convert</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/search/">search</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/leaderboard">leaderboard</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/statistics">statistics</a>
-                  </li>
-                </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search by fingerprint..." type="text" id="search-input" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="search-button"></button>
-                  </form>
-              </div>
-            </div>
-          </nav>
-            <form id="search-form">
-                <input type="text" id="search-input"
-                    placeholder="Search by fingerprint...">
-                <button type="button" id="search-button">Search</button>
-            </form>
-            <script>
+        <script>
                 // Get references to the input and button elements
                 const searchInput = document.getElementById('search-input');
                 const searchButton = document.getElementById('search-button');
@@ -154,10 +123,50 @@ else {
                     }
                 });
             </script>
-            <h2 id="landString"></h2>
-            <h2 id="landString2"></h2>
-            <h2 id="recentString">Recent additions to the network</h2>
-            <div id="recent"></div>
-        </body>
+    </head>
+    <body style="font-family: Roboto;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">oPwngrid</a>
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href>Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/convert">convert</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/search/">search</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/leaderboard">leaderboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/statistics">statistics</a>
+                        </li>
+                    </ul>
+                    <form class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search"
+                            placeholder="Search by fingerprint..." type="text"
+                            id="search-input" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0"
+                            type="button" id="search-button"></button>
+                    </form>
+                </div>
+            </div>
+        </nav>
 
-    </html>
+        <h2 id="landString"></h2>
+        <h2 id="landString2"></h2>
+        <h2 id="recentString">Recent additions to the network</h2>
+        <div id="recent"></div>
+    </body>
+
+</html>
