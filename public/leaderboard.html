@@ -11,7 +11,7 @@
                 $.get("https://api.opwngrid.xyz/api/v1/leaders", function(data) {
                     let pos = 1
                     for (let i = 0; i <= data.length; i++) {
-                        data[i].data = JSON.parse(data[i].data)
+                        //data[i].data = JSON.parse(data[i].data)
                         let leaderDiv = document.getElementById("leaders");
                         let regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
 
