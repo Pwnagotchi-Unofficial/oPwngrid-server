@@ -218,7 +218,7 @@ app.get('/api/statistics/apsByDay', (req, res) => {
 
 app.get('/api/statistics/messagesByDay', (req, res) => {
   console.log("Got: /api/statisics/apsByDay Called")
-  if (!req.params.days || !isNaN(req.params.days)) {
+  if (!req.params.days || !isNaN(req.params.days) || req.params.days > 365) {
     days = 365
   } else {
     days = req.params.days
@@ -240,7 +240,7 @@ app.get('/api/statistics/messagesByDay', (req, res) => {
 app.get('/api/statistics/leaders', (req, res) => {
   console.log("Got: Leaders")
 
-  if (!req.params.units || !isNaN(req.params.units)) {
+  if (!req.params.units || !isNaN(req.params.units) || req.params.units > 100) {
     units = 100
   } else {
     units = req.params.units
@@ -259,7 +259,27 @@ app.get('/api/statistics/leaders', (req, res) => {
   return
 })
 
+app.get('/api/statistics/unitsByDay', (req, res) => {
+  console.log("Got: units By Day")
 
+  if (!req.params.days || !isNaN(req.params.days) || req.params.days > 365) {
+    units = 365
+  } else {
+    units = req.params.days
+  }
+
+  connection.query('SELECT DATE_FORMAT(created_at, \'%Y-%m-%d\') AS day, COUNT(ID) AS units FROM units GROUP BY day ORDER BY day DESC LIMIT ?',
+  [units],
+  function(err, results, fields) {
+    if (err) {
+      res.status(500).json({"error":"Internal Server Error"})
+      console.log(err)
+      return;
+    }
+    res.send(results)
+  })
+  return
+})
 //End of statisics
 
 app.get('/api/v1/unit/inbox/', authenticate, (req,res) => {

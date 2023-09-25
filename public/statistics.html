@@ -84,6 +84,39 @@
             });
 
             })
+
+        
+        $.get(`https://api.opwngrid.xyz/api/statistics/unitsByDay?days=356`, function(data) {
+            const unitsChart = document.getElementById('unitsChart');
+            //FORMAT DATA
+            days = []
+            amount = []
+
+            data.forEach(element => {
+                days.push(element.day)
+                amount.push(element.units)
+            });
+
+            new Chart(messagesChart, {
+              type: 'line',
+              data: {
+                labels: days,
+                datasets: [{
+                  label: '# of units created per day',
+                  data: amount,
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                scales: {
+                  y: {
+                    beginAtZero: true
+                  }
+                }
+              }
+            });
+
+            })
         })
         </script>
     </head>
@@ -132,6 +165,8 @@
                 <canvas id="APsChart"></canvas>
                 <span style="padding: 10px;"></span>
                 <canvas id="messagesChart"></canvas>
+                <span style="padding: 10px;"></span>
+                <canvas id="unitsChart"></canvas>
             </div>
 
         </body>
