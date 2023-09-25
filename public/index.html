@@ -106,23 +106,7 @@ else {
             });
         });
         </script>
-        <script>
-                // Get references to the input and button elements
-                const searchInput = document.getElementById('search-input');
-                const searchButton = document.getElementById('search-button');
-        
-                // Add a click event listener to the button
-                searchButton.addEventListener('click', function () {
-                    // Get the text from the input
-                    const searchText = searchInput.value.trim();
-        
-                    // Check if the input is not empty
-                    if (searchText) {
-                        // Redirect to /search/ with the search query appended
-                        window.location.href = `/search/${encodeURIComponent(searchText)}`;
-                    }
-                });
-            </script>
+
     </head>
     <body style="font-family: Roboto;">
         <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
@@ -162,5 +146,23 @@ else {
         <h2 id="recentString" style="font-family: Roboto;">Recent additions to the network</h2>
         <div id="recent" style="font-family: Roboto;"></div>
     </body>
+<footer>
+    <script>
+        // Get references to the input and button elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
 
+        // Add a click event listener to the button
+        searchButton.addEventListener('click', function () {
+            // Get the text from the input
+            const searchText = searchInput.value.trim();
+
+            // Check if the input is not empty
+            if (searchText) {
+                // Redirect to /search/ with the search query appended
+                window.location.href = `/search/${encodeURIComponent(searchText)}`;
+            }
+        });
+    </script>
+</footer>
 </html>
