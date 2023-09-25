@@ -151,12 +151,13 @@ else {
                     </li>
                 </ul>
               </div>
+              <form id="search-form" class="form-inline">
+                <input type="text" id="search-input"
+                    placeholder="Search by fingerprint...">
+                <button type="button" id="search-button" class="btn btn-outline-success">Search</button>
+            </form>
             </div>
           </nav>
-        <form id="search-form">
-            <input type="text" id="search-input" placeholder="Search...">
-            <button type="button" id="search-button">Search</button>
-        </form>
 
         <script>
             // Get references to the input and button elements
@@ -182,7 +183,7 @@ else {
         <h3 id="userString"></h3>
         <h2 id="Contact">Contact</h2>
         <h3 id="contactString"></h3>
-        <h3 id="contactStringID">No Pwnagotchi was searched for.</h3>
+        <h3 id="contactStringID" class="bg-dark">No Pwnagotchi was searched for.</h3>
 
     </body>
 
