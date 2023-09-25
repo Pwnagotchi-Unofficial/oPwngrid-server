@@ -2,9 +2,9 @@
 
 #contactStringID {
     color: white;
-    background-color:rgba(var(--bs-dark-rgb),var(--bs-bg-opacity))!important;
+    background-color:rgb(33,37,41);
     border: 10px;
     border-style: solid;
     left: 10px;
-    border-color: rgba(var(--bs-dark-rgb),var(--bs-bg-opacity))!important;
+    border-color: rgb(33,37,41);
 }
