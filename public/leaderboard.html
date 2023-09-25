@@ -88,7 +88,6 @@
         </script>
     </head>
     <body style="font-family: Roboto;">
-        <h1>Leaderboard</h1>
         <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
             <div class="container-fluid">
               <a class="navbar-brand" href="#">oPwngrid</a>
@@ -114,13 +113,14 @@
                     </li>
                 </ul>
               </div>
-            </div>
-          </nav>
-            <form id="search-form">
+              <form id="search-form" class="form-inline">
                 <input type="text" id="search-input"
                     placeholder="Search by fingerprint...">
                 <button type="button" id="search-button">Search</button>
             </form>
+            </div>
+          </nav>
+
             <script>
                 // Get references to the input and button elements
                 const searchInput = document.getElementById('search-input');
