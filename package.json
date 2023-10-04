@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node server.js",
     "lint": "npx eslint .",
-    "lint-fix": "npx eslint . --fix"
+    "lint-fix": "npx eslint . --fix",
+    "livereload": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
