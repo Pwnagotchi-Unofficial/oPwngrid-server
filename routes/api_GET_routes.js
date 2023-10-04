@@ -21,7 +21,7 @@ module.exports = function(app, connection) {
         res.send("Custom API for a new pwn system");
     });
 
-    app.get("/api/v1/total", (res) => {
+    app.get("/api/v1/total", (req, res) => {
         // TODO: Preferably move to ORM
         connection.query("SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, ',', -1)) AS countries FROM units",
             function(err, results) {
@@ -36,7 +36,7 @@ module.exports = function(app, connection) {
         return;
     });
 
-    app.get("/api/v1/total/aps", (res) => {
+    app.get("/api/v1/total/aps", (req, res) => {
         connection.query("SELECT COUNT(ID) AS total FROM aps",
             function(err, results) {
                 if (err) {
@@ -49,7 +49,7 @@ module.exports = function(app, connection) {
         return;
     });
 
-    app.get("/api/v1/recent", (res) => {
+    app.get("/api/v1/recent", (req, res) => {
         connection.query("SELECT name,data,created_at,country,identity FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10",
             function(err, results) {
                 if (err) {
