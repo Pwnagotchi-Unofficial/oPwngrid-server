@@ -1,4 +1,4 @@
-//Start of stats page statistics
+// All handlers for page with global statistics
 module.exports = function(app, connection) {
     app.get("/api/statistics/apsByDay", (req, res) => {
         console.log("Got: /api/statisics/apsByDay Called");
@@ -85,5 +85,4 @@ module.exports = function(app, connection) {
             });
         return;
     });
-    //End of statisics
 };
