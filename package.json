@@ -4,7 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node server.js"
+    "test": "node server.js",
+    "lint": "npx eslint .",
+    "lint-fix": "npx eslint . --fix"
   },
   "author": "",
   "license": "ISC",
@@ -18,5 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.2",
     "mysql2": "^3.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0"
   }
 }
