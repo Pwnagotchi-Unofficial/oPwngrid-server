@@ -24,7 +24,7 @@ const connection = mysql.createConnection({
 });
 
 app.use(log);
-app.use(cors({ origin: "https://opwngrid.xyz" }));
+app.use(cors({ origin: ["https://opwngrid.xyz","https://api.opwngrid.xyz"] }));
 
 app.get("*", function(req, res, next){ 
     if(req.headers.host == "opwngrid.xyz") { //if it's a sub-domain
@@ -32,7 +32,7 @@ app.get("*", function(req, res, next){
             res.send("API not here");
             return;
         } else {
-            next();
+            //next();
             return;
         }
     } else if (req.headers.host == "api.opwngrid.xyz") {
