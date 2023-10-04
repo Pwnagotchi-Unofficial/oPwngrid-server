@@ -3,14 +3,14 @@ const jwt = require("jsonwebtoken");
 
 function toJson(req, res, next) {
     if(req.body == undefined) {
-        let buffer = [];
+        const buffer = [];
         req.on("data", function onRequestData(chunk) {
             buffer.push(chunk);
         });
-  
+
         req.once("end", function() {
-            let concated = Buffer.concat(buffer);
-            //console.log(concated.toString('utf8'))
+            const concated = Buffer.concat(buffer);
+            // console.log(concated.toString('utf8'))
             req.body = JSON.parse(concated.toString("utf8"));
             next();
         });
@@ -27,17 +27,17 @@ function authenticate(req, res, next) {
         next();
         return;
     } else {
-        token = req.headers.authorization.slice("Bearer ".length);
+        const token = req.headers.authorization.slice("Bearer ".length);
         if (token.length >= 63) {
             try {
-                decoded = jwt.verify(token, process.env.SECRET);
+                var decoded = jwt.verify(token, process.env.SECRET);
             } catch (err) {
                 console.log(err);
                 console.log("Error Decoding sending 401");
                 res.status(401).json({"error":"token expired or cannot be authenticated"});
                 return;
             }
-            //create a check to see if token is expired
+            // create a check to see if token is expired
             if (decoded.authorized == true) {
                 res.locals.author = decoded;
                 res.locals.authorised = true;

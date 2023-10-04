@@ -1,7 +1,7 @@
 const express = require("express");
 
 module.exports = function(app) {
-    //routing for main website
+    // routing for main website
     app.use(express.static(process.env.PWD + "/public"));
     app.get("/", (req, res) => {
         res.sendFile(process.env.PWD + "/public/index.html");

@@ -1,6 +1,7 @@
 {
     "env": {
         "browser": false,
+        "node": true,
         "commonjs": true,
         "es2021": true
     },
@@ -23,6 +24,58 @@
         ],
         "semi": [
             "error",
+            "always"
+        ],
+        "init-declarations": [
+            "error",
+            "always"
+        ],
+        "prefer-const": [
+            "error",
+            {
+                "destructuring": "all"
+            }
+        ],
+        "spaced-comment": [
+            "warn",
+            "always"
+        ],
+        "no-trailing-spaces": [
+            "error"
+        ],
+        "line-comment-position": [
+            "error",
+            {
+                "position": "above"
+            }
+        ],
+        "comma-dangle": [
+            "error", 
+            "never"
+        ],
+        "comma-spacing": [
+            "error", 
+            { 
+                "before": false, 
+                "after": true 
+            }
+        ],
+        "arrow-parens": [
+            "error", 
+            "always"
+        ],
+        "arrow-spacing": [
+            "error", 
+            { 
+                "before": true, 
+                "after": true 
+            }
+        ],
+        "brace-style": [
+            "error"
+        ],
+        "array-bracket-spacing": [
+            "error", 
             "always"
         ]
     }

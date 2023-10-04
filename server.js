@@ -8,7 +8,7 @@ const mysql = require("mysql2");
 function log(req, res, next) {
     console.log("Got a request type: " + req.method);
     console.warn("Got: " + req.originalUrl);
-    //console.log(req.headers)
+    // console.log(req.headers)
     next();
 }
 
@@ -25,33 +25,34 @@ const connection = mysql.createConnection({
 
 // use custom logger and set up CORS
 app.use(log);
-app.use(cors({ origin: ["https://opwngrid.xyz","https://api.opwngrid.xyz"] }));
+app.use(cors({ origin: [ "https://opwngrid.xyz", "https://api.opwngrid.xyz" ] }));
 
 // TODO: ideally completely drop this
-app.get("*", function(req, res, next){ 
-    if(req.headers.host == "opwngrid.xyz") { //if it's a sub-domain
+app.get("*", function(req, res, next){
+    // if it's a sub-domain
+    if(req.headers.host == "opwngrid.xyz") {
         if (req.url.includes("/api/")) {
             res.send("API not here");
             return;
         } else {
-            //next();
+            // next();
             return;
         }
     } else if (req.headers.host == "api.opwngrid.xyz") {
         if (req.url.includes("/api/")) {
-            next(); 
+            next();
             return;
         } else {
             res.status(404).json({"error":"Not Found"});
             return;
         }
-    } 
+    }
     res.status(404).json({"error":"Not Found"});
 });
 
 // all routes leading to static content here
 // disabled, since frontend moved to its own repo
-//require("./routes/static_routes.js")(app);
+// require("./routes/static_routes.js")(app);
 
 // all routes regarding statistics
 require("./routes/statistics_routes.js")(app, connection);
@@ -66,7 +67,7 @@ process.on("SIGINT", function() {
     });
 });
 
-//App Listen ---------------------------
+// App Listen ---------------------------
 app.listen(port, () => {
     console.log(`grid listening on port ${port}`);
 });

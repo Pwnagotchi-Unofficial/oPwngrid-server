@@ -1,7 +1,4 @@
-const updateToken = require("../utils/token.js");
-const crypto = require("crypto");
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
 const utils = require("../utils/helpers.js");
 
 // for tracking uptime
@@ -9,9 +6,9 @@ const startTime = Date.now();
 
 module.exports = function(app, connection) {
     // uptime keeper
-    app.get("/api/v1/uptime", (req,res) => {
-        let time = Date.now() - startTime;
-        res.json({isUp:true,uptime:time});
+    app.get("/api/v1/uptime", (req, res) => {
+        const time = Date.now() - startTime;
+        res.json({isUp:true, uptime:time});
     });
 
     app.get("/api/v1/units", (req, res) => {
@@ -24,10 +21,10 @@ module.exports = function(app, connection) {
         res.send("Custom API for a new pwn system");
     });
 
-    app.get("/api/v1/total", (req, res) => {
+    app.get("/api/v1/total", (res) => {
         // TODO: Preferably move to ORM
         connection.query("SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, ',', -1)) AS countries FROM units",
-            function(err, results, fields) {
+            function(err, results) {
                 if (err) {
                     // TODO: Be more specific
                     res.status(500).json({"error":"Internal Server Error"});
@@ -39,9 +36,9 @@ module.exports = function(app, connection) {
         return;
     });
 
-    app.get("/api/v1/total/aps", (req, res) => {
+    app.get("/api/v1/total/aps", (res) => {
         connection.query("SELECT COUNT(ID) AS total FROM aps",
-            function(err, results, fields) {
+            function(err, results) {
                 if (err) {
                     res.status(500).json({"error":"Internal Server Error"});
                     console.log(err);
@@ -52,9 +49,9 @@ module.exports = function(app, connection) {
         return;
     });
 
-    app.get("/api/v1/recent", (req, res) => {
+    app.get("/api/v1/recent", (res) => {
         connection.query("SELECT name,data,created_at,country,identity FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10",
-            function(err, results, fields) {
+            function(err, results) {
                 if (err) {
                     res.status(500).json({"error":"Internal Server Error"});
                     console.log(err);
@@ -65,7 +62,7 @@ module.exports = function(app, connection) {
         return;
     });
 
-    app.get("/api/v1/unit/inbox/", utils.authenticate, (req,res) => {
+    app.get("/api/v1/unit/inbox/", utils.authenticate, (req, res) => {
         console.log("Got /api/v1/unit/inbox/");
         if (res.locals.authorised == false) {
             console.warn("Unauthorised request to mailbox");
@@ -73,36 +70,36 @@ module.exports = function(app, connection) {
             return;
         }
 
-        limit = 10;
+        const limit = 10;
         connection.query("SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ",
-            [res.locals.author.unit_ident[1]],
-            function(err, results, fields) {
+            [ res.locals.author.unit_ident[1] ],
+            function(err, results) {
                 if (err) {
                     console.log(err);
                     res.status(500).json({"error":"Internal Server Error"});
                     return;
                 }
-                console.log("total messages for unit: "+results.length);
-        
+                console.log("total messages for unit: " + results.length);
+
                 let offset = 0;
                 if (req.query.p === 1) {
                     offset = 0;
-                    pages = Math.ceil(results.length / limit);
+                    var pages = Math.ceil(results.length / limit);
                 } else {
                     offset = (req.query.p * limit) - limit;
                     pages = Math.ceil(results.length / limit);
                 }
                 connection.query("SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,data,signature,id FROM messages WHERE receiver = ? LIMIT ? OFFSET ?",
-                    [res.locals.author.unit_ident[1],limit,offset],
-                    function(err, results, fields) {
+                    [ res.locals.author.unit_ident[1], limit, offset ],
+                    function(err, results) {
                         if (err) {
                             console.log(err);
                             res.status(500).json({"error":"Internal Server Error"});
                             return;
                         }
-                        //Create the pages system pwngrid uses
-                        messages = {
-                            "pages": pages,//pages
+                        // Create the pages system pwngrid uses
+                        const messages = {
+                            "pages": pages,
                             "records":results.length,
                             "messages": results
                         };
@@ -114,23 +111,23 @@ module.exports = function(app, connection) {
         return;
     });
 
-    //Searching for a unit 
-    //via web search api
+    // Searching for a unit
+    // via web search api
     app.get("/api/v1/search/:fingerprint", utils.authenticate, (req, res) => {
-        //got unit search
-        //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
+        // got unit search
+        // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
         console.log("Got web search for " + req.params.fingerprint);
-        //Query fingerprint via mysql
+        // Query fingerprint via mysql
         connection.query("SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1",
-            [req.params.fingerprint,req.params.fingerprint],
-            function(err, results, fields) {
+            [ req.params.fingerprint, req.params.fingerprint ],
+            function(err, results) {
                 if (err) {
                     console.log(err);
                     res.status(500).json({"error":"Internal Server Error"});
                     return;
                 }
                 if (results.length === 0) {
-        
+
                     res.status(200).json({"error":"Not Found"});
                     return;
                 }
@@ -138,15 +135,15 @@ module.exports = function(app, connection) {
             });
     });
 
-    //Via pwngrid binary
+    // Via pwngrid binary
     app.get("/api/v1/unit/:fingerprint", utils.authenticate, (req, res) => {
-        //got unit search
-        //https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
+        // got unit search
+        // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
         console.log("Got unit search for " + req.params.fingerprint);
-        //Query fingerprint via mysql
+        // Query fingerprint via mysql
         connection.query("SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?",
-            [req.params.fingerprint],
-            function(err, results, fields) {
+            [ req.params.fingerprint ],
+            function(err, results) {
                 if (err) {
                     console.log(err);
                     res.status(500).json({"error":"Internal Server Error"});
@@ -162,12 +159,12 @@ module.exports = function(app, connection) {
             });
     });
 
-    //Get message by id.
-    app.get("/api/v1/unit/inbox/:messageId", utils.authenticate, (req,res) => {
+    // Get message by id.
+    app.get("/api/v1/unit/inbox/:messageId", utils.authenticate, (req, res) => {
         if (res.locals.authorised) {
             connection.query("SELECT created_at,updated_at,seen_at,deleted_at,sender,sender_name,data,signature,id FROM messages WHERE id = ? AND receiver = ?",
-                [req.params.messageId, res.locals.author.unit_ident[1]],
-                function(err, results, fields) {
+                [ req.params.messageId, res.locals.author.unit_ident[1] ],
+                function(err, results) {
                     if (err) {
                         console.log(err);
                         res.status(500).json({"error":"Internal Server Error"});
@@ -180,15 +177,15 @@ module.exports = function(app, connection) {
         }
     });
 
-    //Mark a message
-    app.get("/api/v1/unit/inbox/:messageId/:mark", utils.authenticate, (req,res) => {
+    // Mark a message
+    app.get("/api/v1/unit/inbox/:messageId/:mark", utils.authenticate, (req, res) => {
         console.log("Got: /api/v1/unit/inbox/:messageId/:mark");
-        console.log(req.params.messageId,req.params.mark);
+        console.log(req.params.messageId, req.params.mark);
         if (req.params.mark === "seen") {
-        //mark message seen
+        // mark message seen
             connection.query("UPDATE messages SET seen_at = CURRENT_TIMESTAMP WHERE id = ? AND receiver = ?",
-                [req.params.messageId,res.locals.author.unit_ident[1]],
-                function(err, results, fields) {
+                [ req.params.messageId, res.locals.author.unit_ident[1] ],
+                function(err) {
                     if (err) {
                         console.error(err);
                         res.status(500).json({"error":"Internal Server Error"});
@@ -200,8 +197,8 @@ module.exports = function(app, connection) {
                 });
         } else if (req.params.mark === "deleted") {
             connection.query("DELETE FROM  messages WHERE id = ? AND receiver = ?",
-                [req.params.messageId,res.locals.author.unit_ident[1]],
-                function(err, results, fields) {
+                [ req.params.messageId, res.locals.author.unit_ident[1] ],
+                function(err) {
                     if (err) {
                         console.error(err);
                         res.status(500).json({"error":"Internal Server Error"});
@@ -213,8 +210,8 @@ module.exports = function(app, connection) {
                 });
         } else if (req.params.mark === "unseen") {
             connection.query("UPDATE messages SET seen = NULL WHERE id = ? AND receiver = ?",
-                [req.params.messageId,res.locals.author.unit_ident[1]],
-                function(err, results, fields) {
+                [ req.params.messageId, res.locals.author.unit_ident[1] ],
+                function(err) {
                     if (err) {
                         console.error(err);
                         res.status(500).json({"error":"Internal Server Error"});
@@ -231,12 +228,12 @@ module.exports = function(app, connection) {
         }
     });
 
-    //send a message
-    app.post("/api/v1/unit/:fingerprint/inbox", utils.toJson, utils.authenticate, (req,res) => {
+    // send a message
+    app.post("/api/v1/unit/:fingerprint/inbox", utils.toJson, utils.authenticate, (req, res) => {
         if (res.locals.authorised) {
             connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
-                [req.params.fingerprint,res.locals.author.unit_ident[0],res.locals.author.unit_ident[1],req.body.data,req.body.signature],
-                function(err, results, fields) {
+                [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
+                function(err) {
                     if (err) {
                         console.error(err);
                         res.status(500).json({"error":"Internal Server Error"});
