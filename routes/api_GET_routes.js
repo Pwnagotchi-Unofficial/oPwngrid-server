@@ -70,8 +70,8 @@ module.exports = function(app, connection) {
             return;
         }
 
-        const limit = 10;
-        connection.query("SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,id FROM messages WHERE receiver = ? ",
+        const limit = 10; // this value equals the limit per page on a pwnas web interface
+        connection.query("SELECT count(id) as count FROM messages WHERE receiver = ? ",
             [ res.locals.author.unit_ident[1] ],
             function(err, results) {
                 if (err) {
@@ -79,15 +79,15 @@ module.exports = function(app, connection) {
                     res.status(500).json({"error":"Internal Server Error"});
                     return;
                 }
-                console.log("total messages for unit: " + results.length);
+                
 
                 let offset = 0;
                 if (req.query.p === 1) {
                     offset = 0;
-                    var pages = Math.ceil(results.length / limit);
+                    var pages = Math.ceil(results.count / limit);
                 } else {
                     offset = (req.query.p * limit) - limit;
-                    pages = Math.ceil(results.length / limit);
+                    pages = Math.ceil(results.count / limit);
                 }
                 connection.query("SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,data,signature,id FROM messages WHERE receiver = ? LIMIT ? OFFSET ?",
                     [ res.locals.author.unit_ident[1], limit, offset ],
