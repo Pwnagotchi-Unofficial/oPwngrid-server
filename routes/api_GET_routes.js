@@ -70,7 +70,8 @@ module.exports = function(app, connection) {
             return;
         }
 
-        const limit = 10; // this value equals the limit per page on a pwnas web interface
+        const limit = 10;
+        // this value equals the limit per page on a pwnas web interface
         connection.query("SELECT count(id) as count FROM messages WHERE receiver = ? ",
             [ res.locals.author.unit_ident[1] ],
             function(err, results) {
@@ -79,7 +80,7 @@ module.exports = function(app, connection) {
                     res.status(500).json({"error":"Internal Server Error"});
                     return;
                 }
-                
+
 
                 let offset = 0;
                 if (req.query.p === 1) {

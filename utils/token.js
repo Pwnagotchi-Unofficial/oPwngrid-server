@@ -8,7 +8,6 @@ const minutesToExpire = 60;
 function updateToken(identity, id) {
 
     const now = DateTime.utc().plus({ minutes: minutesToExpire }).toRFC2822();
-    console.log(identity);
 
     const token = jwt.sign({
         authorized : true,
@@ -16,7 +15,6 @@ function updateToken(identity, id) {
         unit_ident : identity,
         expires_at : now
     }, process.env.SECRET, { algorithm: "HS256"});
-    console.log("Created New token: " + token);
     return token;
 }
 

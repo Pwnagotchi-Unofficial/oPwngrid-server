@@ -56,4 +56,11 @@ function authenticate(req, res, next) {
     }
 }
 
-module.exports = {toJson, authenticate};
+function log(req, res, next) {
+    console.log("Got a request type: " + req.method);
+    console.warn("Got: " + req.originalUrl);
+    // console.log(req.headers)
+    next();
+}
+
+module.exports = {toJson, authenticate, log};
