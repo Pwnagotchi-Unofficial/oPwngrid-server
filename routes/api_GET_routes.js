@@ -80,16 +80,23 @@ module.exports = function(app, connection) {
                     res.status(500).json({"error":"Internal Server Error"});
                     return;
                 }
-
-
-                let offset = 0;
-                if (req.query.p === 1) {
-                    offset = 0;
-                    var pages = Math.ceil(results.count / limit);
-                } else {
-                    offset = (req.query.p * limit) - limit;
-                    pages = Math.ceil(results.count / limit);
+                let count = results[0].count;
+                if (!count) {
+                    count = 0;
                 }
+                let page = req.query.p;
+                if (!page) {
+                    page = 1;
+                }
+                let offset = 0;
+                if (page === 1) {
+                    offset = 0;
+                    var pages = Math.ceil(count / limit);
+                } else {
+                    offset = (page * limit) - limit;
+                    pages = Math.ceil(count / limit);
+                }
+                const records = count;
                 connection.query("SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,data,signature,id FROM messages WHERE receiver = ? LIMIT ? OFFSET ?",
                     [ res.locals.author.unit_ident[1], limit, offset ],
                     function(err, results) {
@@ -99,9 +106,10 @@ module.exports = function(app, connection) {
                             return;
                         }
                         // Create the pages system pwngrid uses
+                        pages = Math.ceil(records / limit);
                         const messages = {
                             "pages": pages,
-                            "records":results.length,
+                            "records":records,
                             "messages": results
                         };
                         res.status(200).json(messages);
@@ -229,24 +237,4 @@ module.exports = function(app, connection) {
         }
     });
 
-    // send a message
-    app.post("/api/v1/unit/:fingerprint/inbox", utils.toJson, utils.authenticate, (req, res) => {
-        if (res.locals.authorised) {
-            connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
-                [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
-                function(err) {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({"error":"Internal Server Error"});
-                        return;
-                    }
-                    res.status(200).json({"status":"success"});
-                    return;
-                });
-        } else {
-            res.status(401).json({"error":"Unauthorised request"});
-            console.log("Unauthed Request to send a message");
-            return;
-        }
-    });
 };

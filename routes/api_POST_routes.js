@@ -222,4 +222,24 @@ module.exports = function (app, connection) {
             );
         });
     });
+
+    app.post("/api/v1/unit/:fingerprint/inbox", utils.toJson, utils.authenticate, (req, res) => {
+        if (res.locals.authorised) {
+            connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
+                [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
+                function(err) {
+                    if (err) {
+                        console.error(err);
+                        res.status(500).json({"error":"Internal Server Error"});
+                        return;
+                    }
+                    res.status(200).json({"status":"success"});
+                    return;
+                });
+        } else {
+            res.status(401).json({"error":"Unauthorised request"});
+            console.log("Unauthed Request to send a message");
+            return;
+        }
+    });
 };
