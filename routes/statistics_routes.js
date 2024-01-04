@@ -3,7 +3,7 @@ function getDays(req) {
     if (!req.params.days || isNaN(req.query.days) || req.query.days > 365) {
         return 365;
     } else {
-        return req.query.days;
+        return parseInt(req.query.days);
     }
 }
 
@@ -11,7 +11,7 @@ function getUnits(req) {
     if (!req.query.units || isNaN(req.query.units) || req.query.units > 100) {
         return 100;
     } else {
-        return req.query.units;
+        return parseInt(req.query.units);
     }
 }
 
