@@ -1,17 +1,17 @@
 // All handlers for page with global statistics
 function getDays(req) {
-    if (!req.params.days || isNaN(req.params.days) || req.params.days > 365) {
+    if (!req.params.days || isNaN(req.query.days) || req.query.days > 365) {
         return 365;
     } else {
-        return req.params.days;
+        return req.query.days;
     }
 }
 
 function getUnits(req) {
-    if (!req.params.units || isNaN(req.params.units) || req.params.units > 100) {
+    if (!req.query.units || isNaN(req.query.units) || req.query.units > 100) {
         return 100;
     } else {
-        return req.params.units;
+        return req.query.units;
     }
 }
 
@@ -52,7 +52,7 @@ module.exports = function(app, connection) {
 
     app.get("/api/statistics/leaders", (req, res) => {
         console.log("Got: Leaders");
-        console.log(req.params.units);
+        console.log(req.query.units);
         const units = getUnits(req);
 
         connection.query("SELECT u.country, u.name, a.identity, u.data, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) AND a.time > '2023-09-01 01:01:01' GROUP BY u.country, u.name, a.identity, u.data ORDER BY amount DESC LIMIT ?;",
