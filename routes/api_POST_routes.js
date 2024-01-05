@@ -137,7 +137,8 @@ module.exports = function (app, connection) {
                         }
                     });
                     if (reported == false) {
-                        // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so how is adding another row for the same AP
+                        // unit has not reported the AP before so continue to add it to db
+                        // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
                         connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
                             [ req.body.bssid, req.body.essid, res.locals.author.unit_ident[1] ],
                             function (err) {
@@ -196,12 +197,35 @@ module.exports = function (app, connection) {
                         return;
                     }
                     // If results is 0, it exists, so send OK
-                    if (results.length == 1) {
-                        console.log("Received existing AP");
-                        console.log(results.length);
-                        res.status(200).json({ "status": "success" });
+                    if (results.length <= 1) {
+                        let reported = false;
+                        results.forEach((element) => {
+                            if (element.identity == res.locals.author.unit_ident[1]) {
+                                reported = true;
+                                return;
+                            }
+                        });
+                        if (reported == false) {
+                            // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
+                            connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
+                                [ req.body.bssid, req.body.essid, res.locals.author.unit_ident[1] ],
+                                function (err) {
+                                    if (err) {
+                                        // Handle the error, but don't send a response here
+                                        console.error(err);
+                                        res.status(500).json({ "error": "Internal Server Error" });
+                                        return;
+                                    }
+                                    // Send a response when the insertion is successful
+                                    res.status(200).json({ "status": "success" });
+                                }
+                            );
+                        } else {
+                            res.status(200).json({ "status": "success" });
+                            return;
+                        }
                         return;
-                    } else if (results.length >= 0) {
+                    } else if (results.length == 0) {
                         console.log("Received new AP");
                         // Because no APs exist with that SSID, add it to the database.
                         connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
