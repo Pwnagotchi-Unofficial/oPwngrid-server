@@ -157,7 +157,7 @@ module.exports = function (app, connection) {
                         return;
                     }
                     return;
-                } else if (results.length >= 0) {
+                } else if (results.length == 0) {
                     console.log("Received new AP");
                     console.log(req.body.bssid);
                     // Because no APs exist with that SSID, add it to the database.
