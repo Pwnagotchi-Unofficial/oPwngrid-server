@@ -118,6 +118,7 @@ module.exports = function (app, connection) {
     // send APs Posts
     app.post("/api/v1/unit/report/ap", utils.toJson, utils.authenticate, (req, res) => {
         console.log("AP incoming");
+
         if (res.locals.authorised === false) {
             console.warn("Warning | Unauthorised device tried to send AP");
             res.status(401).json({ "error": "Unauthorised request" });
@@ -138,17 +139,18 @@ module.exports = function (app, connection) {
                     return;
                 }
                 console.log("Lets see if its been reported before");
+                console.log(results.length);
                 // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
-                if (results.length <= 1) {
+                if (results.length >= 1) {
                     let reported = false;
-                    results.forEach((element) => {
+                    for (const element of results) {
                         if (element.identity == res.locals.author.unit_ident[1]) {
                             reported = true;
-                            return;
+                            break;
                         }
-                    });
+                    }
                     if (reported == false) {
-                        console.log("AP has not been reported before from this identity")
+                        console.log("AP has not been reported before from this identity");
                         // unit has not reported the AP before so continue to add it to db
                         // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
                         connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
@@ -169,7 +171,6 @@ module.exports = function (app, connection) {
                         res.status(200).json({ "status": "success" });
                         return;
                     }
-                    return;
                 } else if (results.length == 0) {
                     console.log("it hasnt been reported before");
                     // Because no APs exist with that SSID, add it to the database.
@@ -185,11 +186,10 @@ module.exports = function (app, connection) {
                             // Send a response when the insertion is successful
                             console.log("sending 200 for a new AP");
                             res.status(200).json({ "status": "success" });
-                        }
-                    );
+                            return;
+                        });
                 }
-            }
-        );
+            });
     });
 
     app.post("/api/v1/unit/report/aps", utils.toJson, utils.authenticate, (req, res) => {
@@ -199,9 +199,8 @@ module.exports = function (app, connection) {
             res.status(401).json({ "error": "Unauthorised request" });
             return;
         }
-
         req.body.forEach(function (ap) {
-            connection.query("SELECT bssid, essid FROM aps WHERE bssid = (UNHEX(REPLACE(?, ':','' )))",
+            connection.query("SELECT bssid, essid, identity FROM aps WHERE bssid = (UNHEX(REPLACE(?, ':','' )))",
                 [ ap.bssid ],
                 function (err, results) {
                     if (err) {
@@ -209,23 +208,26 @@ module.exports = function (app, connection) {
                         res.status(500).json({ "error": "Internal Server Error" });
                         return;
                     }
-                    // If results is 0, it exists, so send OK
-                    if (results.length <= 1) {
+                    // console.log("Lets see if its been reported before");
+                    // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
+                    if (results.length >= 1) {
                         let reported = false;
-                        results.forEach((element) => {
+                        for (const element of results) {
                             if (element.identity == res.locals.author.unit_ident[1]) {
                                 reported = true;
-                                return;
+                                break;
                             }
-                        });
+                        }
                         if (reported == false) {
+                            console.log("AP has not been reported before from this identity");
+                            // unit has not reported the AP before so continue to add it to db
                             // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
                             connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
-                                [ req.body.bssid, req.body.essid, res.locals.author.unit_ident[1] ],
+                                [ ap.bssid, ap.essid, res.locals.author.unit_ident[1] ],
                                 function (err) {
                                     if (err) {
                                         // Handle the error, but don't send a response here
-                                        console.error(err);
+                                        // console.error(err);
                                         res.status(500).json({ "error": "Internal Server Error" });
                                         return;
                                     }
@@ -234,12 +236,12 @@ module.exports = function (app, connection) {
                                 }
                             );
                         } else {
+                            // console.log("It has been reported sending 200, but not storing it again");
                             res.status(200).json({ "status": "success" });
                             return;
                         }
-                        return;
                     } else if (results.length == 0) {
-                        console.log("Received new AP");
+                        // console.log("it hasnt been reported before");
                         // Because no APs exist with that SSID, add it to the database.
                         connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
                             [ ap.bssid, ap.essid, res.locals.author.unit_ident[1] ],
@@ -251,12 +253,12 @@ module.exports = function (app, connection) {
                                     return;
                                 }
                                 // Send a response when the insertion is successful
+                                console.log("sending 200 for a new AP");
                                 res.status(200).json({ "status": "success" });
-                            }
-                        );
+                                return;
+                            });
                     }
-                }
-            );
+                });
         });
     });
 
@@ -269,13 +271,13 @@ module.exports = function (app, connection) {
 
         connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
             [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
-            function(err) {
+            function (err) {
                 if (err) {
                     console.error(err);
-                    res.status(500).json({"error":"Internal Server Error"});
+                    res.status(500).json({ "error": "Internal Server Error" });
                     return;
                 }
-                res.status(200).json({"status":"success"});
+                res.status(200).json({ "status": "success" });
                 return;
             });
     });
