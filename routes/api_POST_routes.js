@@ -15,6 +15,11 @@ module.exports = function (app, connection) {
         // }
         console.log("Enroll from: " + req.body.identity);
 
+        if (!req.body.identity && !req.body.public_key && !req.body.signature) {
+            res.status(422).json({ "error": "invalid body format" });
+            return;
+        }
+
         const identity = req.body.identity.split("@");
 
         // Before we enroll we want to check the device follows our methods of verifying identity
@@ -112,12 +117,17 @@ module.exports = function (app, connection) {
 
     // send APs Posts
     app.post("/api/v1/unit/report/ap", utils.toJson, utils.authenticate, (req, res) => {
-        console.log("AP received");
+        console.log("AP incoming");
         if (res.locals.authorised === false) {
             console.warn("Warning | Unauthorised device tried to send AP");
             res.status(401).json({ "error": "Unauthorised request" });
             return;
         }
+        if (!req.body.bssid && !req.body.essid) {
+            res.status(422).json({ "error": "Invalid body format" });
+            return;
+        }
+
         // Check if BSSID has been reported before
         connection.query("SELECT bssid, essid, identity FROM aps WHERE bssid = (UNHEX(REPLACE(?, ':','' )))",
             [ req.body.bssid ],
@@ -127,6 +137,7 @@ module.exports = function (app, connection) {
                     res.status(500).json({ "error": "Internal Server Error" });
                     return;
                 }
+                console.log("Lets see if its been reported before");
                 // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
                 if (results.length <= 1) {
                     let reported = false;
@@ -137,6 +148,7 @@ module.exports = function (app, connection) {
                         }
                     });
                     if (reported == false) {
+                        console.log("AP has not been reported before from this identity")
                         // unit has not reported the AP before so continue to add it to db
                         // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
                         connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
@@ -153,13 +165,13 @@ module.exports = function (app, connection) {
                             }
                         );
                     } else {
+                        console.log("It has been reported sending 200, but not storing it again");
                         res.status(200).json({ "status": "success" });
                         return;
                     }
                     return;
                 } else if (results.length == 0) {
-                    console.log("Received new AP");
-                    console.log(req.body.bssid);
+                    console.log("it hasnt been reported before");
                     // Because no APs exist with that SSID, add it to the database.
                     connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
                         [ req.body.bssid, req.body.essid, res.locals.author.unit_ident[1] ],
@@ -171,6 +183,7 @@ module.exports = function (app, connection) {
                                 return;
                             }
                             // Send a response when the insertion is successful
+                            console.log("sending 200 for a new AP");
                             res.status(200).json({ "status": "success" });
                         }
                     );
@@ -248,22 +261,22 @@ module.exports = function (app, connection) {
     });
 
     app.post("/api/v1/unit/:fingerprint/inbox", utils.toJson, utils.authenticate, (req, res) => {
-        if (res.locals.authorised) {
-            connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
-                [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
-                function(err) {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({"error":"Internal Server Error"});
-                        return;
-                    }
-                    res.status(200).json({"status":"success"});
-                    return;
-                });
-        } else {
-            res.status(401).json({"error":"Unauthorised request"});
-            console.log("Unauthed Request to send a message");
+        if (res.locals.authorised === false) {
+            console.warn("Warning | Unauthorised device tried to send MESSAGEP");
+            res.status(401).json({ "error": "Unauthorised request" });
             return;
         }
+
+        connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
+            [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
+            function(err) {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({"error":"Internal Server Error"});
+                    return;
+                }
+                res.status(200).json({"status":"success"});
+                return;
+            });
     });
 };
