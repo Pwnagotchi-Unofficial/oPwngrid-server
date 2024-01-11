@@ -84,4 +84,23 @@ module.exports = function(app, connection) {
             });
         return;
     });
+
+    app.get("/api/statistics/unitsByCountry", (req, res) => {
+        console.log("Got: units By Day");
+        const days = getDays(req);
+
+        connection.query("SELECT country, COUNT(*) AS units FROM units WHERE updated_at >= NOW() - INTERVAL 30 DAY GROUP BY country;",
+            [ days ],
+            function(err, results) {
+                if (err) {
+                    res.status(500).json({"error":"Internal Server Error"});
+                    console.log(err);
+                    return;
+                }
+                res.send(results);
+            });
+        return;
+    });
+
+
 };
