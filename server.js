@@ -57,13 +57,6 @@ if (process.env.ENVIROMENT == "dev") {
     });
 }
 
-// TODO: ideally completely drop this
-
-
-// all routes leading to static content here
-// disabled, since frontend moved to its own repo
-// require("./routes/static_routes.js")(app);
-
 // all routes regarding statistics
 require("./routes/statistics_routes.js")(app, connection);
 
