@@ -1,10 +1,12 @@
 require("dotenv").config();
 const utils = require("../utils/helpers.js");
 
+const db = require("../db");
+
 // for tracking uptime
 const startTime = Date.now();
 
-module.exports = function(app, connection) {
+module.exports = function(app) {
     // uptime keeper
     app.get("/api/v1/uptime", (req, res) => {
         const time = Date.now() - startTime;
@@ -23,43 +25,37 @@ module.exports = function(app, connection) {
 
     app.get("/api/v1/total", (req, res) => {
         // TODO: Preferably move to ORM
-        connection.query("SELECT COUNT(ID) AS total, COUNT(DISTINCT SUBSTRING_INDEX(country, ',', -1)) AS countries FROM units",
-            function(err, results) {
-                if (err) {
-                    // TODO: Be more specific
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results[0]);
-            });
-        return;
+        db.units.total((err, total) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(total);
+        });
     });
 
     app.get("/api/v1/total/aps", (req, res) => {
-        connection.query("SELECT COUNT(ID) AS total FROM aps",
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results[0]);
-            });
-        return;
+        db.accessPoints.total((err, total) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+
+            res.send(total);
+        });
     });
 
     app.get("/api/v1/recent", (req, res) => {
-        connection.query("SELECT name,data,created_at,country,identity FROM units WHERE created_at >= NOW() - INTERVAL 1 YEAR ORDER BY created_at DESC LIMIT 10",
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results);
-            });
-        return;
+        db.units.recent((err, units) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(units);
+        });
     });
 
     app.get("/api/v1/unit/inbox/", utils.authenticate, (req, res) => {
@@ -72,51 +68,47 @@ module.exports = function(app, connection) {
 
         const limit = 10;
         // this value equals the limit per page on a pwnas web interface
-        connection.query("SELECT count(id) as count FROM messages WHERE receiver = ? ",
-            [ res.locals.author.unit_ident[1] ],
-            function(err, results) {
+        db.inbox.totalMessages(res.locals.author.unit_ident[1], (err, count) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({"error":"Internal Server Error"});
+                return;
+            }
+
+            if (!count) {
+                count = 0;
+            }
+            let page = req.query.p;
+            if (!page) {
+                page = 1;
+            }
+            let offset = 0;
+            if (page === 1) {
+                offset = 0;
+                var pages = Math.ceil(count / limit);
+            } else {
+                offset = (page * limit) - limit;
+                pages = Math.ceil(count / limit);
+            }
+            const records = count;
+            db.inbox.messages(res.locals.author.unit_ident[1], limit, offset, (err, messages) => {
                 if (err) {
                     console.log(err);
                     res.status(500).json({"error":"Internal Server Error"});
                     return;
                 }
-                let count = results[0].count;
-                if (!count) {
-                    count = 0;
-                }
-                let page = req.query.p;
-                if (!page) {
-                    page = 1;
-                }
-                let offset = 0;
-                if (page === 1) {
-                    offset = 0;
-                    var pages = Math.ceil(count / limit);
-                } else {
-                    offset = (page * limit) - limit;
-                    pages = Math.ceil(count / limit);
-                }
-                const records = count;
-                connection.query("SELECT created_at,updated_at,deleted_at,seen_at,sender,sender_name,data,signature,id FROM messages WHERE receiver = ? LIMIT ? OFFSET ?",
-                    [ res.locals.author.unit_ident[1], limit, offset ],
-                    function(err, results) {
-                        if (err) {
-                            console.log(err);
-                            res.status(500).json({"error":"Internal Server Error"});
-                            return;
-                        }
-                        // Create the pages system pwngrid uses
-                        pages = Math.ceil(records / limit);
-                        const messages = {
-                            "pages": pages,
-                            "records":records,
-                            "messages": results
-                        };
-                        res.status(200).json(messages);
-                        return;
-                    });
+                // Create the pages system pwngrid uses
+                pages = Math.ceil(records / limit);
+                const response = {
+                    "pages": pages,
+                    "records":records,
+                    "messages": messages
+                };
+                res.status(200).json(response);
                 return;
             });
+            return;
+        });
         return;
     });
 
@@ -127,21 +119,18 @@ module.exports = function(app, connection) {
         // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
         console.log("Got web search for " + req.params.fingerprint);
         // Query fingerprint via mysql
-        connection.query("SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1",
-            [ req.params.fingerprint, req.params.fingerprint ],
-            function(err, results) {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json({"error":"Internal Server Error"});
-                    return;
-                }
-                if (results.length === 0) {
-
-                    res.status(200).json({"error":"Not Found"});
-                    return;
-                }
-                res.send(JSON.stringify(results[0]));
-            });
+        db.units.webSearch(req.params.fingerprint, (err, unit) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({"error":"Internal Server Error"});
+                return;
+            }
+            if (!unit) {
+                res.status(404).json({"error":"Not Found"});
+                return;
+            }
+            res.json(unit);
+        });
     });
 
     // Via pwngrid binary
@@ -150,37 +139,36 @@ module.exports = function(app, connection) {
         // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
         console.log("Got unit search for " + req.params.fingerprint);
         // Query fingerprint via mysql
-        connection.query("SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?",
-            [ req.params.fingerprint ],
-            function(err, results) {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json({"error":"Internal Server Error"});
-                    return;
+        db.units.gridSearch(req.params.fingerprint, (err, unit) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({"error":"Internal Server Error"});
+                return;
 
-                }
-                if (results.length === 0) {
-
-                    res.status(404).json({"error":"Not Found"});
-                    return;
-                }
-                res.send(JSON.stringify(results[0]));
-            });
+            }
+            if (!unit) {
+                res.status(404).json({"error":"Not Found"});
+                return;
+            }
+            res.json(unit);
+        });
     });
 
     // Get message by id.
     app.get("/api/v1/unit/inbox/:messageId", utils.authenticate, (req, res) => {
         if (res.locals.authorised) {
-            connection.query("SELECT created_at,updated_at,seen_at,deleted_at,sender,sender_name,data,signature,id FROM messages WHERE id = ? AND receiver = ?",
-                [ req.params.messageId, res.locals.author.unit_ident[1] ],
-                function(err, results) {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({"error":"Internal Server Error"});
-                        return;
-                    }
-                    res.send(results[0]);
-                });
+            db.inbox.message(req.params.messageId, res.locals.author.unit_ident[1], (err, message) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({"error":"Internal Server Error"});
+                    return;
+                }
+
+                if(!message)
+                    res.status(404).json({"error":"Not Found"});
+                else
+                    res.json(message);
+            });
         } else {
             res.status(401).json({"error":"Unauthorised request"});
         }
@@ -192,44 +180,38 @@ module.exports = function(app, connection) {
         console.log(req.params.messageId, req.params.mark);
         if (req.params.mark === "seen") {
         // mark message seen
-            connection.query("UPDATE messages SET seen_at = CURRENT_TIMESTAMP WHERE id = ? AND receiver = ?",
-                [ req.params.messageId, res.locals.author.unit_ident[1] ],
-                function(err) {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({"error":"Internal Server Error"});
-                        return;
-                    }
-                    console.log("Updated Message");
-                    res.status(200).json({"status":"success"});
+            db.inbox.markMessageSeen(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({"error":"Internal Server Error"});
                     return;
-                });
+                }
+                console.log("Updated Message");
+                res.status(200).json({"status":"success"});
+                return;
+            });
         } else if (req.params.mark === "deleted") {
-            connection.query("DELETE FROM  messages WHERE id = ? AND receiver = ?",
-                [ req.params.messageId, res.locals.author.unit_ident[1] ],
-                function(err) {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({"error":"Internal Server Error"});
-                        return;
-                    }
-                    console.log("Updated Message");
-                    res.status(200).json({"status":"success"});
+            db.inbox.deleteMessage(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({"error":"Internal Server Error"});
                     return;
-                });
+                }
+                console.log("Updated Message");
+                res.status(200).json({"status":"success"});
+                return;
+            });
         } else if (req.params.mark === "unseen") {
-            connection.query("UPDATE messages SET seen = NULL WHERE id = ? AND receiver = ?",
-                [ req.params.messageId, res.locals.author.unit_ident[1] ],
-                function(err) {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({"error":"Internal Server Error"});
-                        return;
-                    }
-                    console.log("Updated Message");
-                    res.status(200).json({"status":"success"});
+            db.inbox.markMessageUnseen(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({"error":"Internal Server Error"});
                     return;
-                });
+                }
+                console.log("Updated Message");
+                res.status(200).json({"status":"success"});
+                return;
+            });
         } else {
             res.status(401).json({"error":"Unauthorised request"});
             console.log("Unauthed Request to send a message");

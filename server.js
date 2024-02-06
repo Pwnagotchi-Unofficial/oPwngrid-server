@@ -2,7 +2,6 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
-const mysql = require("mysql2");
 const utils = require("./utils/helpers.js");
 // custom logger
 
@@ -10,15 +9,7 @@ const utils = require("./utils/helpers.js");
 // get port on which service should be available from env
 const port = process.env.PORT;
 
-// create database connection
-
 console.log(`[START] enviroment: ${process.env.ENVIROMENT}`);
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    database: process.env.DB,
-    password: process.env.DB_PASS
-});
 
 // use custom logger and set up CORS
 app.use(utils.log);
@@ -58,20 +49,13 @@ if (process.env.ENVIROMENT == "dev") {
 }
 
 // all routes regarding statistics
-require("./routes/statistics_routes.js")(app, connection);
+require("./routes/statistics_routes.js")(app);
 
 // all routes regarding API
-require("./routes/api_GET_routes.js")(app, connection);
-require("./routes/api_POST_routes.js")(app, connection);
-
-process.on("SIGINT", function() {
-    connection.end(function(err) {
-        process.exit(err ? 1 : 0);
-    });
-});
+require("./routes/api_GET_routes.js")(app);
+require("./routes/api_POST_routes.js")(app);
 
 // App Listen ---------------------------
 app.listen(port, () => {
     console.log(`[WEB] listening on port ${port}`);
-
 });

@@ -2,8 +2,9 @@ const updateToken = require("../utils/token.js");
 const crypto = require("crypto");
 require("dotenv").config();
 const utils = require("../utils/helpers.js");
+const db = require("../db");
 
-module.exports = function (app, connection) {
+module.exports = function (app) {
     // enroll post
     app.post("/api/v1/unit/enroll", utils.toJson, (req, res) => {
         // enroll sends
@@ -46,73 +47,67 @@ module.exports = function (app, connection) {
             return;
         }
         // check if unit is already in our database
-        connection.query("SELECT * from units WHERE identity = ?",
-            [ identity[1] ],
-            function (err, results) {
-                if (err) {
-                    console.error(err);
-                    res.status(500).json({ "error": "Internal Server Error" });
-                    return;
-                }
-                if (results.length == 0) {
-                    console.log("Enrolling New");
-                    let country = "XX";
-                    let addr = null;
-                    let data = {};
+        db.units.search(identity[1], (err, units) => {
+            if (err) {
+                console.error(err);
+                res.status(500).json({ "error": "Internal Server Error" });
+                return;
+            }
+            if (units.length == 0) {
+                console.log("Enrolling New");
+                let country = "XX";
+                let addr = null;
+                let data = {};
 
-                    pub_key = Buffer.from(req.body.public_key, "base64").toString();
-                    if (req && req.headers && req.headers["x-forwarded-for"]) {
-                        addr = req.headers["x-forwarded-for"];
-                    } else {
-                        console.warn("Error: X-Forwarded-For header is missing or undefined");
-                        addr = null;
-                    }
-                    if (req && req.headers && req.headers["cf-ipcountry"]) {
-                        country = req.headers["cf-ipcountry"];
-                    } else {
-                        console.warn("Error: CF-IpCountry header is missing or undefined");
-                        country = "XX";
-                    }
-                    if (req && req.body && req.body.data) {
-                        data = req.body.data;
-                    } else {
-                        console.warn("Error: data is missing or undefined");
-                        data = {};
-                    }
-                    connection.query("INSERT INTO units (name,identity,public_key,address,country,data) VALUES (?,?,?,?,?,?)",
-                        [ identity[0], identity[1], pub_key, addr, country, JSON.stringify(data) ],
-                        function (results) {
-                            res.status(200).send(JSON.stringify({ "token": updateToken(identity, results.insertId) }));
-                            console.log("Enrolled new");
-                            return;
-                        }
-                    );
-                } else if (results.length == 1) {
-                    let data = {};
-                    if (req && req.body && req.body.data) {
-                        data = req.body.data;
-                    } else {
-                        console.error("Error: data is missing or undefined");
-                        data = {};
-                    }
-                    connection.query("UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1",
-                        [ JSON.stringify(data), identity[0], identity[1] ],
-                        function (err) {
-                            if (err) {
-                                console.error(err);
-                                res.status(500).json({ "error": "Internal Server Error" });
-                                return;
-                            }
-                            console.log("Updating enrollee: " + identity[1]);
-                            return;
-                        });
-                    res.status(200).send(JSON.stringify({ "token": updateToken(identity, results.insertId) }));
-                } else if (results.length > 1) {
-                    console.log("Tried to enroll, but database return error or more than 1 match");
-                    res.status(500).json({ "error": "Internal Server Error. Please report this to @rai68 asap, as a id_rsa has been matched, which doesnt make sense." });
-                    return;
+                pub_key = Buffer.from(req.body.public_key, "base64").toString();
+                if (req && req.headers && req.headers["x-forwarded-for"]) {
+                    addr = req.headers["x-forwarded-for"];
+                } else {
+                    console.warn("Error: X-Forwarded-For header is missing or undefined");
+                    addr = null;
                 }
-            });
+                if (req && req.headers && req.headers["cf-ipcountry"]) {
+                    country = req.headers["cf-ipcountry"];
+                } else {
+                    console.warn("Error: CF-IpCountry header is missing or undefined");
+                    country = "XX";
+                }
+                if (req && req.body && req.body.data) {
+                    data = req.body.data;
+                } else {
+                    console.warn("Error: data is missing or undefined");
+                    data = {};
+                }
+                db.units.add(identity[0], identity[1], pub_key, addr, country, JSON.stringify(data), (results) => {
+                    res.status(200).send(JSON.stringify({ "token": updateToken(identity, results.insertId) }));
+                    console.log("Enrolled new");
+                    return;
+                });
+            } else if (units.length == 1) {
+                let data = {};
+                if (req && req.body && req.body.data) {
+                    data = req.body.data;
+                } else {
+                    console.error("Error: data is missing or undefined");
+                    data = {};
+                }
+                db.units.update(identity[1], identity[0], JSON.stringify(data), (err) => {
+                    if (err) {
+                        console.error(err);
+                        res.status(500).json({ "error": "Internal Server Error" });
+                        return;
+                    }
+                    console.log("Updating enrollee: " + identity[1]);
+                    return;
+                });
+                // TODO: should be removed
+                res.status(200).send(JSON.stringify({ "token": updateToken(identity, units.insertId) }));
+            } else if (units.length > 1) {
+                console.log("Tried to enroll, but database return error or more than 1 match");
+                res.status(500).json({ "error": "Internal Server Error. Please report this to @rai68 asap, as a id_rsa has been matched, which doesnt make sense." });
+                return;
+            }
+        });
     });
 
     // send APs Posts
@@ -130,66 +125,59 @@ module.exports = function (app, connection) {
         }
 
         // Check if BSSID has been reported before
-        connection.query("SELECT bssid, essid, identity FROM aps WHERE bssid = (UNHEX(REPLACE(?, ':','' )))",
-            [ req.body.bssid ],
-            function (err, results) {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json({ "error": "Internal Server Error" });
+        db.accessPoints.search(req.body.bssid, (err, aps) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({ "error": "Internal Server Error" });
+                return;
+            }
+            console.log("Lets see if its been reported before");
+            console.log(aps.length);
+            // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
+            if (aps.length >= 1) {
+                let reported = false;
+                for (const ap of aps) {
+                    if (ap.identity == res.locals.author.unit_ident[1]) {
+                        reported = true;
+                        break;
+                    }
+                }
+                if (reported == false) {
+                    console.log("AP has not been reported before from this identity");
+                    // unit has not reported the AP before so continue to add it to db
+                    // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
+                    db.accessPoints.add(req.body.bssid, req.body.essid, res.locals.author.unit_ident[1], (err) => {
+                        if (err) {
+                            // Handle the error, but don't send a response here
+                            console.error(err);
+                            res.status(500).json({ "error": "Internal Server Error" });
+                            return;
+                        }
+                        // Send a response when the insertion is successful
+                        res.status(200).json({ "status": "success" });
+                    });
+                } else {
+                    console.log("It has been reported sending 200, but not storing it again");
+                    res.status(200).json({ "status": "success" });
                     return;
                 }
-                console.log("Lets see if its been reported before");
-                console.log(results.length);
-                // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
-                if (results.length >= 1) {
-                    let reported = false;
-                    for (const element of results) {
-                        if (element.identity == res.locals.author.unit_ident[1]) {
-                            reported = true;
-                            break;
-                        }
-                    }
-                    if (reported == false) {
-                        console.log("AP has not been reported before from this identity");
-                        // unit has not reported the AP before so continue to add it to db
-                        // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
-                        connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
-                            [ req.body.bssid, req.body.essid, res.locals.author.unit_ident[1] ],
-                            function (err) {
-                                if (err) {
-                                    // Handle the error, but don't send a response here
-                                    console.error(err);
-                                    res.status(500).json({ "error": "Internal Server Error" });
-                                    return;
-                                }
-                                // Send a response when the insertion is successful
-                                res.status(200).json({ "status": "success" });
-                            }
-                        );
-                    } else {
-                        console.log("It has been reported sending 200, but not storing it again");
-                        res.status(200).json({ "status": "success" });
+            } else if (aps.length == 0) {
+                console.log("it hasnt been reported before");
+                // Because no APs exist with that SSID, add it to the database.
+                db.accessPoints.add(req.body.bssid, req.body.essid, res.locals.author.unit_ident[1], (err) => {
+                    if (err) {
+                        // Handle the error, but don't send a response here
+                        console.error(err);
+                        res.status(500).json({ "error": "Internal Server Error" });
                         return;
                     }
-                } else if (results.length == 0) {
-                    console.log("it hasnt been reported before");
-                    // Because no APs exist with that SSID, add it to the database.
-                    connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
-                        [ req.body.bssid, req.body.essid, res.locals.author.unit_ident[1] ],
-                        function (err) {
-                            if (err) {
-                                // Handle the error, but don't send a response here
-                                console.error(err);
-                                res.status(500).json({ "error": "Internal Server Error" });
-                                return;
-                            }
-                            // Send a response when the insertion is successful
-                            console.log("sending 200 for a new AP");
-                            res.status(200).json({ "status": "success" });
-                            return;
-                        });
-                }
-            });
+                    // Send a response when the insertion is successful
+                    console.log("sending 200 for a new AP");
+                    res.status(200).json({ "status": "success" });
+                    return;
+                });
+            }
+        });
     });
 
     app.post("/api/v1/unit/report/aps", utils.toJson, utils.authenticate, (req, res) => {
@@ -200,65 +188,58 @@ module.exports = function (app, connection) {
             return;
         }
         req.body.forEach(function (ap) {
-            connection.query("SELECT bssid, essid, identity FROM aps WHERE bssid = (UNHEX(REPLACE(?, ':','' )))",
-                [ ap.bssid ],
-                function (err, results) {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ "error": "Internal Server Error" });
+            db.accessPoints.search(ap.bssid, (err, aps) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ "error": "Internal Server Error" });
+                    return;
+                }
+                // console.log("Lets see if its been reported before");
+                // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
+                if (aps.length >= 1) {
+                    let reported = false;
+                    for (const element of aps) {
+                        if (element.identity == res.locals.author.unit_ident[1]) {
+                            reported = true;
+                            break;
+                        }
+                    }
+                    if (reported == false) {
+                        console.log("AP has not been reported before from this identity");
+                        // unit has not reported the AP before so continue to add it to db
+                        // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
+                        db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
+                            if (err) {
+                                // Handle the error, but don't send a response here
+                                // console.error(err);
+                                res.status(500).json({ "error": "Internal Server Error" });
+                                return;
+                            }
+                            // Send a response when the insertion is successful
+                            res.status(200).json({ "status": "success" });
+                        });
+                    } else {
+                        // console.log("It has been reported sending 200, but not storing it again");
+                        res.status(200).json({ "status": "success" });
                         return;
                     }
-                    // console.log("Lets see if its been reported before");
-                    // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
-                    if (results.length >= 1) {
-                        let reported = false;
-                        for (const element of results) {
-                            if (element.identity == res.locals.author.unit_ident[1]) {
-                                reported = true;
-                                break;
-                            }
-                        }
-                        if (reported == false) {
-                            console.log("AP has not been reported before from this identity");
-                            // unit has not reported the AP before so continue to add it to db
-                            // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
-                            connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
-                                [ ap.bssid, ap.essid, res.locals.author.unit_ident[1] ],
-                                function (err) {
-                                    if (err) {
-                                        // Handle the error, but don't send a response here
-                                        // console.error(err);
-                                        res.status(500).json({ "error": "Internal Server Error" });
-                                        return;
-                                    }
-                                    // Send a response when the insertion is successful
-                                    res.status(200).json({ "status": "success" });
-                                }
-                            );
-                        } else {
-                            // console.log("It has been reported sending 200, but not storing it again");
-                            res.status(200).json({ "status": "success" });
+                } else if (aps.length == 0) {
+                    // console.log("it hasnt been reported before");
+                    // Because no APs exist with that SSID, add it to the database.
+                    db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
+                        if (err) {
+                            // Handle the error, but don't send a response here
+                            console.error(err);
+                            res.status(500).json({ "error": "Internal Server Error" });
                             return;
                         }
-                    } else if (results.length == 0) {
-                        // console.log("it hasnt been reported before");
-                        // Because no APs exist with that SSID, add it to the database.
-                        connection.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)",
-                            [ ap.bssid, ap.essid, res.locals.author.unit_ident[1] ],
-                            function (err) {
-                                if (err) {
-                                    // Handle the error, but don't send a response here
-                                    console.error(err);
-                                    res.status(500).json({ "error": "Internal Server Error" });
-                                    return;
-                                }
-                                // Send a response when the insertion is successful
-                                console.log("sending 200 for a new AP");
-                                res.status(200).json({ "status": "success" });
-                                return;
-                            });
-                    }
-                });
+                        // Send a response when the insertion is successful
+                        console.log("sending 200 for a new AP");
+                        res.status(200).json({ "status": "success" });
+                        return;
+                    });
+                }
+            });
         });
     });
 
@@ -269,16 +250,14 @@ module.exports = function (app, connection) {
             return;
         }
 
-        connection.query("INSERT INTO messages (receiver,sender_name,sender,data,signature) VALUES (?,?,?,?,?)",
-            [ req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature ],
-            function (err) {
-                if (err) {
-                    console.error(err);
-                    res.status(500).json({ "error": "Internal Server Error" });
-                    return;
-                }
-                res.status(200).json({ "status": "success" });
+        db.inbox.add(req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature, (err) => {
+            if (err) {
+                console.error(err);
+                res.status(500).json({ "error": "Internal Server Error" });
                 return;
-            });
+            }
+            res.status(200).json({ "status": "success" });
+            return;
+        });
     });
 };

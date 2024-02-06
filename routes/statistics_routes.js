@@ -1,3 +1,5 @@
+const db = require("../db");
+
 // All handlers for page with global statistics
 function getDays(req) {
     if (!req.params.days || isNaN(req.query.days) || req.query.days > 365) {
@@ -15,21 +17,19 @@ function getUnits(req) {
     }
 }
 
-module.exports = function(app, connection) {
+module.exports = function(app) {
     app.get("/api/statistics/apsByDay", (req, res) => {
         console.log("Got: /api/statisics/apsByDay Called");
         const days = getDays(req);
 
-        connection.query("SELECT DATE_FORMAT(time, '%Y-%m-%d') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?",
-            [ days ],
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results);
-            });
+        db.statistics.apsByDay(days, (err, results) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(results);
+        });
         return;
     });
 
@@ -37,16 +37,14 @@ module.exports = function(app, connection) {
         console.log("Got: /api/statisics/apsByDay Called");
         const days = getDays(req);
 
-        connection.query("SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, COUNT(ID) AS messages FROM messages GROUP BY day ORDER BY day DESC LIMIT ?",
-            [ days ],
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results);
-            });
+        db.statistics.messagesByDay(days, (err, results) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(results);
+        });
         return;
     });
 
@@ -55,16 +53,14 @@ module.exports = function(app, connection) {
         console.log(req.query.units);
         const units = getUnits(req);
 
-        connection.query("SELECT u.country, u.name, a.identity, COUNT(DISTINCT a.bssid) AS amount FROM units u JOIN aps a ON u.identity = a.identity WHERE u.updated_at >= DATE_SUB(NOW(), INTERVAL 10 DAY) GROUP BY u.country, u.name, a.identity, u.data ORDER BY amount DESC LIMIT ?;",
-            [ units ],
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results);
-            });
+        db.statistics.leaders(units, (err, results) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(results);
+        });
         return;
     });
 
@@ -72,16 +68,14 @@ module.exports = function(app, connection) {
         console.log("Got: units By Day");
         const days = getDays(req);
 
-        connection.query("SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, COUNT(ID) AS units FROM units GROUP BY day ORDER BY day DESC LIMIT ?",
-            [ days ],
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results);
-            });
+        db.statistics.unitsByDay(days, (err, results) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(results);
+        });
         return;
     });
 
@@ -89,18 +83,14 @@ module.exports = function(app, connection) {
         console.log("Got: units By Day");
         const days = getDays(req);
 
-        connection.query("SELECT country, COUNT(*) AS units FROM units WHERE updated_at >= NOW() - INTERVAL 30 DAY GROUP BY country;",
-            [ days ],
-            function(err, results) {
-                if (err) {
-                    res.status(500).json({"error":"Internal Server Error"});
-                    console.log(err);
-                    return;
-                }
-                res.send(results);
-            });
+        db.statistics.unitsByCountry(days, (err, results) => {
+            if (err) {
+                res.status(500).json({"error":"Internal Server Error"});
+                console.log(err);
+                return;
+            }
+            res.send(results);
+        });
         return;
     });
-
-
 };
