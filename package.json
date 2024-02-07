@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node server.js",
+    "start": "node server.js",
     "lint": "npx standard",
     "lint-fix": "npx standard --fix",
     "livereload": "nodemon server.js"
