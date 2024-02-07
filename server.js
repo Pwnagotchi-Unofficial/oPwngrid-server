@@ -3,6 +3,7 @@ require('dotenv').config()
 const app = express()
 const cors = require('cors')
 const utils = require('./utils/helpers.js')
+const routes = require('./routes')
 // custom logger
 
 // get port on which service should be available from env
@@ -47,12 +48,13 @@ if (process.env.ENVIROMENT === 'dev') {
   })
 }
 
-// all routes regarding statistics
-require('./routes/statistics_routes.js')(app)
-
-// all routes regarding API
-require('./routes/api_GET_routes.js')(app)
-require('./routes/api_POST_routes.js')(app)
+app.use('/api/v1/units', routes.units)
+app.use('/api/v1/unit', routes.unit)
+app.use('/api/v1/uptime', routes.uptime)
+app.use('/api/v1/total', routes.total)
+app.use('/api/v1/recent', routes.recent)
+app.use('/api/v1/search', routes.search)
+app.use('/api/statistics', routes.statistics) // TODO: doesn't follow APIs logic -> should be changed to /api/v1/statistics
 
 // App Listen ---------------------------
 app.listen(port, () => {
