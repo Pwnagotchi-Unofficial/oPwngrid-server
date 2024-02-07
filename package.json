@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "node server.js",
-    "lint": "npx eslint .",
-    "lint-fix": "npx eslint . --fix",
+    "lint": "npx standard",
+    "lint-fix": "npx standard --fix",
     "livereload": "nodemon server.js"
   },
   "author": "",
@@ -23,6 +23,6 @@
     "mysql2": "^3.6.1"
   },
   "devDependencies": {
-    "eslint": "^8.50.0"
+    "standard": "^17.1.0"
   }
 }
