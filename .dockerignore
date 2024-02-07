@@ -1,0 +1,12 @@
+.git
+.env
+.env.sample
+Dockerfile
+LICENSE
+README.md
+node_modules
+DB_Schema
+.vscode
+.github
+.gitattributes
+.gitignore
