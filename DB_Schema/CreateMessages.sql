@@ -1,4 +1,4 @@
-DROP TABLE messages;
+DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (
 	id int NOT NULL PRIMARY KEY auto_increment,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
