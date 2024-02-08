@@ -1,5 +1,6 @@
 const express = require('express')
 const db = require('../db')
+const logger = require('../logger')('routes-statistics')
 
 // All handlers for page with global statistics
 function getDays (req) {
@@ -22,13 +23,11 @@ const router = express.Router()
 
 // Base endpoint: /api/statistics
 router.get('/apsByDay', (req, res) => {
-  console.log('Got: /api/statisics/apsByDay Called')
   const days = getDays(req)
-
   db.statistics.apsByDay(days, (err, results) => {
     if (err) {
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
-      console.log(err)
       return
     }
     res.send(results)
@@ -36,13 +35,11 @@ router.get('/apsByDay', (req, res) => {
 })
 
 router.get('/messagesByDay', (req, res) => {
-  console.log('Got: /api/statisics/apsByDay Called')
   const days = getDays(req)
-
   db.statistics.messagesByDay(days, (err, results) => {
     if (err) {
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
-      console.log(err)
       return
     }
     res.send(results)
@@ -50,14 +47,14 @@ router.get('/messagesByDay', (req, res) => {
 })
 
 router.get('/leaders', (req, res) => {
-  console.log('Got: Leaders')
-  console.log(req.query.units)
+  logger.info('Got: Leaders')
+  logger.info(req.query.units)
   const units = getUnits(req)
 
   db.statistics.leaders(units, (err, results) => {
     if (err) {
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
-      console.log(err)
       return
     }
     res.send(results)
@@ -65,13 +62,11 @@ router.get('/leaders', (req, res) => {
 })
 
 router.get('/unitsByDay', (req, res) => {
-  console.log('Got: units By Day')
   const days = getDays(req)
-
   db.statistics.unitsByDay(days, (err, results) => {
     if (err) {
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
-      console.log(err)
       return
     }
     res.send(results)
@@ -79,13 +74,11 @@ router.get('/unitsByDay', (req, res) => {
 })
 
 router.get('/unitsByCountry', (req, res) => {
-  console.log('Got: units By Day')
   const days = getDays(req)
-
   db.statistics.unitsByCountry(days, (err, results) => {
     if (err) {
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
-      console.log(err)
       return
     }
     res.send(results)

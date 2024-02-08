@@ -4,14 +4,14 @@ const crypto = require('crypto')
 require('dotenv').config()
 const db = require('../db')
 const utils = require('../utils/helpers')
+const logger = require('../logger')('routes-unit')
 
 const router = express.Router()
 
 // Base endpoint: /api/v1/unit
 router.get('/inbox', utils.authenticate, (req, res) => {
-  console.log('Got /api/v1/unit/inbox/')
   if (res.locals.authorised === false) {
-    console.warn('Unauthorised request to mailbox')
+    logger.warn('Unauthorised request to mailbox')
     res.status(401).json({ error: 'token expired or cannot be authenticated' })
     return
   }
@@ -20,7 +20,7 @@ router.get('/inbox', utils.authenticate, (req, res) => {
   // this value equals the limit per page on a pwnas web interface
   db.inbox.totalMessages(res.locals.author.unit_ident[1], (err, count) => {
     if (err) {
-      console.log(err)
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
       return
     }
@@ -42,7 +42,7 @@ router.get('/inbox', utils.authenticate, (req, res) => {
     const records = count
     db.inbox.messages(res.locals.author.unit_ident[1], limit, offset, (err, messages) => {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
@@ -61,11 +61,11 @@ router.get('/inbox', utils.authenticate, (req, res) => {
 router.get('/:fingerprint', utils.authenticate, (req, res) => {
   // got unit search
   // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
-  console.log('Got unit search for ' + req.params.fingerprint)
+  logger.info('Got unit search for ' + req.params.fingerprint)
   // Query fingerprint via mysql
   db.units.gridSearch(req.params.fingerprint, (err, unit) => {
     if (err) {
-      console.log(err)
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
       return
     }
@@ -81,7 +81,7 @@ router.get('/inbox/:messageId', utils.authenticate, (req, res) => {
   if (res.locals.authorised) {
     db.inbox.message(req.params.messageId, res.locals.author.unit_ident[1], (err, message) => {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
@@ -94,42 +94,40 @@ router.get('/inbox/:messageId', utils.authenticate, (req, res) => {
 })
 
 router.get('/inbox/:messageId/:mark', utils.authenticate, (req, res) => {
-  console.log('Got: /api/v1/unit/inbox/:messageId/:mark')
-  console.log(req.params.messageId, req.params.mark)
   if (req.params.mark === 'seen') {
     // mark message seen
     db.inbox.markMessageSeen(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
       if (err) {
-        console.error(err)
+        logger.error(err)
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
-      console.log('Updated Message')
+      logging.info('Updated Message')
       res.status(200).json({ status: 'success' })
     })
   } else if (req.params.mark === 'deleted') {
     db.inbox.deleteMessage(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
       if (err) {
-        console.error(err)
+        logger.error(err)
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
-      console.log('Updated Message')
+      logging.info('Updated Message')
       res.status(200).json({ status: 'success' })
     })
   } else if (req.params.mark === 'unseen') {
     db.inbox.markMessageUnseen(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
       if (err) {
-        console.error(err)
+        logger.error(err)
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
-      console.log('Updated Message')
+      logging.info('Updated Message')
       res.status(200).json({ status: 'success' })
     })
   } else {
     res.status(401).json({ error: 'Unauthorised request' })
-    console.log('Unauthed Request to send a message')
+    logging.info('Unauthed Request to send a message')
   }
 })
 
@@ -141,7 +139,7 @@ router.post('/enroll', utils.toJson, (req, res) => {
   //  "signature":  signature64,
   //  "data":       c.data,
   // }
-  console.log('Enroll from: ' + req.body.identity)
+  logging.info('Enroll from: ' + req.body.identity)
 
   if (!req.body.identity && !req.body.public_key && !req.body.signature) {
     res.status(422).json({ error: 'invalid body format' })
@@ -163,25 +161,25 @@ router.post('/enroll', utils.toJson, (req, res) => {
     Buffer.from(req.body.signature, 'base64'))
 
   if (!result) {
-    console.warn('Signature is NOT valid. A device has attempted to enroll that cannot verify its self.')
+    logger.warn('Signature is NOT valid. A device has attempted to enroll that cannot verify its self.')
     res.status(401).json({ error: 'signature is invalid' })
     return
   } else if (result) {
-    console.log('Signature is valid. continuing')
+    logger.info('Signature is valid. continuing')
   } else {
-    console.error('Result is not true or false, how does this work?')
+    logger.error('Result is not true or false, how does this work?')
     res.status(401).json({ error: 'signature is invalid' })
     return
   }
   // check if unit is already in our database
   db.units.search(identity[1], (err, units) => {
     if (err) {
-      console.error(err)
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
       return
     }
     if (units.length === 0) {
-      console.log('Enrolling New')
+      logger.info('Enrolling New')
       let country = 'XX'
       let addr = null
       let data = {}
@@ -190,55 +188,55 @@ router.post('/enroll', utils.toJson, (req, res) => {
       if (req && req.headers && req.headers['x-forwarded-for']) {
         addr = req.headers['x-forwarded-for']
       } else {
-        console.warn('Error: X-Forwarded-For header is missing or undefined')
+        logger.warn('Error: X-Forwarded-For header is missing or undefined')
         addr = null
       }
       if (req && req.headers && req.headers['cf-ipcountry']) {
         country = req.headers['cf-ipcountry']
       } else {
-        console.warn('Error: CF-IpCountry header is missing or undefined')
+        logger.warn('Error: CF-IpCountry header is missing or undefined')
         country = 'XX'
       }
       if (req && req.body && req.body.data) {
         data = req.body.data
       } else {
-        console.warn('Error: data is missing or undefined')
+        logger.warn('Error: data is missing or undefined')
         data = {}
       }
       db.units.add(identity[0], identity[1], pubKey, addr, country, JSON.stringify(data), (results) => {
+        logger.info('Enrolled new')
         res.status(200).send(JSON.stringify({ token: updateToken(identity, results.insertId) }))
-        console.log('Enrolled new')
       })
     } else if (units.length === 1) {
       let data = {}
       if (req && req.body && req.body.data) {
         data = req.body.data
       } else {
-        console.error('Error: data is missing or undefined')
+        logger.error('Error: data is missing or undefined')
         data = {}
       }
       db.units.update(identity[1], identity[0], JSON.stringify(data), (err) => {
         if (err) {
-          console.error(err)
+          logger.error(err)
           res.status(500).json({ error: 'Internal Server Error' })
           return
         }
-        console.log('Updating enrollee: ' + identity[1])
+        logger.info('Updating enrollee: ' + identity[1])
       })
       // TODO: should be removed
       res.status(200).send(JSON.stringify({ token: updateToken(identity, units.insertId) }))
     } else if (units.length > 1) {
-      console.log('Tried to enroll, but database return error or more than 1 match')
+      logger.info('Tried to enroll, but database return error or more than 1 match')
       res.status(500).json({ error: 'Internal Server Error. Please report this to @rai68 asap, as a id_rsa has been matched, which doesnt make sense.' })
     }
   })
 })
 
 router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
-  console.log('AP incoming')
+  logger.info('AP incoming')
 
   if (res.locals.authorised === false) {
-    console.warn('Warning | Unauthorised device tried to send AP')
+    logger.warn('Warning | Unauthorised device tried to send AP')
     res.status(401).json({ error: 'Unauthorised request' })
     return
   }
@@ -250,12 +248,12 @@ router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
   // Check if BSSID has been reported before
   db.accessPoints.search(req.body.bssid, (err, aps) => {
     if (err) {
-      console.log(err)
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
       return
     }
-    console.log('Lets see if its been reported before')
-    console.log(aps.length)
+    logger.info('Lets see if its been reported before')
+    logger.info(aps.length)
     // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
     if (aps.length >= 1) {
       let reported = false
@@ -266,13 +264,13 @@ router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
         }
       }
       if (reported === false) {
-        console.log('AP has not been reported before from this identity')
+        logger.info('AP has not been reported before from this identity')
         // unit has not reported the AP before so continue to add it to db
         // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
         db.accessPoints.add(req.body.bssid, req.body.essid, res.locals.author.unit_ident[1], (err) => {
           if (err) {
             // Handle the error, but don't send a response here
-            console.error(err)
+            logger.error(err)
             res.status(500).json({ error: 'Internal Server Error' })
             return
           }
@@ -280,21 +278,21 @@ router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
           res.status(200).json({ status: 'success' })
         })
       } else {
-        console.log('It has been reported sending 200, but not storing it again')
+        logger.info('It has been reported sending 200, but not storing it again')
         res.status(200).json({ status: 'success' })
       }
     } else if (aps.length === 0) {
-      console.log('it hasnt been reported before')
+      logger.info('it hasnt been reported before')
       // Because no APs exist with that SSID, add it to the database.
       db.accessPoints.add(req.body.bssid, req.body.essid, res.locals.author.unit_ident[1], (err) => {
         if (err) {
           // Handle the error, but don't send a response here
-          console.error(err)
+          logger.error(err)
           res.status(500).json({ error: 'Internal Server Error' })
           return
         }
         // Send a response when the insertion is successful
-        console.log('sending 200 for a new AP')
+        logger.info('sending 200 for a new AP')
         res.status(200).json({ status: 'success' })
       })
     }
@@ -302,16 +300,16 @@ router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
 })
 
 router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
-  console.log('AP received')
+  logger.info('AP received')
   if (res.locals.authorised === false) {
-    console.warn('Warning | Unauthorised device tried to send AP')
+    logger.warn('Warning | Unauthorised device tried to send AP')
     res.status(401).json({ error: 'Unauthorised request' })
     return
   }
   req.body.forEach(function (ap) {
     db.accessPoints.search(ap.bssid, (err, aps) => {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
@@ -326,13 +324,13 @@ router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
           }
         }
         if (reported === false) {
-          console.log('AP has not been reported before from this identity')
+          logger.info('AP has not been reported before from this identity')
           // unit has not reported the AP before so continue to add it to db
           // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
           db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
             if (err) {
               // Handle the error, but don't send a response here
-              // console.error(err);
+              logger.error(err);
               res.status(500).json({ error: 'Internal Server Error' })
               return
             }
@@ -349,12 +347,12 @@ router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
         db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
           if (err) {
             // Handle the error, but don't send a response here
-            console.error(err)
+            logger.error(err)
             res.status(500).json({ error: 'Internal Server Error' })
             return
           }
           // Send a response when the insertion is successful
-          console.log('sending 200 for a new AP')
+          logger.info('sending 200 for a new AP')
           res.status(200).json({ status: 'success' })
         })
       }
@@ -364,14 +362,14 @@ router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
 
 router.post('/:fingerprint/inbox', utils.toJson, utils.authenticate, (req, res) => {
   if (res.locals.authorised === false) {
-    console.warn('Warning | Unauthorised device tried to send MESSAGEP')
+    logger.warn('Warning | Unauthorised device tried to send MESSAGEP')
     res.status(401).json({ error: 'Unauthorised request' })
     return
   }
 
   db.inbox.add(req.params.fingerprint, res.locals.author.unit_ident[0], res.locals.author.unit_ident[1], req.body.data, req.body.signature, (err) => {
     if (err) {
-      console.error(err)
+      logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
       return
     }

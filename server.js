@@ -1,18 +1,18 @@
 const express = require('express')
 require('dotenv').config()
-const app = express()
 const cors = require('cors')
-const utils = require('./utils/helpers.js')
 const routes = require('./routes')
-// custom logger
+const logger = require('./logger')('main')
+const middlewares = require('./middlewares')
 
 // get port on which service should be available from env
 const port = process.env.PORT
 
+const app = express()
+
 console.log(`[START] enviroment: ${process.env.ENVIROMENT}`)
 
-// use custom logger and set up CORS
-app.use(utils.log)
+app.use(middlewares.logger)
 
 if (process.env.NODE_ENV === 'production') { app.use(cors({ origin: ['https://opwngrid.xyz', 'https://api.opwngrid.xyz'] })) }
 
@@ -33,5 +33,6 @@ app.use((req, res) => {
 
 // App Listen ---------------------------
 app.listen(port, () => {
-  console.log(`[WEB] listening on port ${port}`)
+  logger.info(`Server listening on port ${port}`)
+  logger.info(`Environment: ${process.env.NODE_ENV}`)
 })
