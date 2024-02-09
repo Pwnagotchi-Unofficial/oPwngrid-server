@@ -102,7 +102,7 @@ router.get('/inbox/:messageId/:mark', utils.authenticate, (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
-      logging.info('Updated Message')
+      logger.info('Updated Message')
       res.status(200).json({ status: 'success' })
     })
   } else if (req.params.mark === 'deleted') {
@@ -112,7 +112,7 @@ router.get('/inbox/:messageId/:mark', utils.authenticate, (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
-      logging.info('Updated Message')
+      logger.info('Updated Message')
       res.status(200).json({ status: 'success' })
     })
   } else if (req.params.mark === 'unseen') {
@@ -122,12 +122,12 @@ router.get('/inbox/:messageId/:mark', utils.authenticate, (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' })
         return
       }
-      logging.info('Updated Message')
+      logger.info('Updated Message')
       res.status(200).json({ status: 'success' })
     })
   } else {
     res.status(401).json({ error: 'Unauthorised request' })
-    logging.info('Unauthed Request to send a message')
+    logger.info('Unauthed Request to send a message')
   }
 })
 
@@ -139,7 +139,7 @@ router.post('/enroll', utils.toJson, (req, res) => {
   //  "signature":  signature64,
   //  "data":       c.data,
   // }
-  logging.info('Enroll from: ' + req.body.identity)
+  logger.info('Enroll from: ' + req.body.identity)
 
   if (!req.body.identity && !req.body.public_key && !req.body.signature) {
     res.status(422).json({ error: 'invalid body format' })
