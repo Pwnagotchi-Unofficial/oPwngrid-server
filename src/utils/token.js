@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
-require('dotenv').config()
 const { DateTime } = require('luxon')
+const config = require('../config').jwt
 
 // Expiration time of tokens
 const minutesToExpire = 60
@@ -13,7 +13,7 @@ function updateToken (identity, id) {
     unit_id: id,
     unit_ident: identity,
     expires_at: now
-  }, process.env.SECRET, { algorithm: 'HS256' })
+  }, config.secret, { algorithm: 'HS256' })
   return token
 }
 

@@ -1,7 +1,6 @@
 const express = require('express')
 const updateToken = require('../utils/token.js')
 const crypto = require('crypto')
-require('dotenv').config()
 const db = require('../db')
 const authenticate = require('../middlewares').authenticate
 const logger = require('../logger')('routes-unit')

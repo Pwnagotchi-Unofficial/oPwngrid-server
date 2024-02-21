@@ -1,22 +1,19 @@
 const express = require('express')
-require('dotenv').config()
 const cors = require('cors')
+const config = require('./config')
 const routes = require('./routes')
 const logger = require('./logger')('main')
 const middlewares = require('./middlewares')
 
-// get port on which service should be available from env
-const port = process.env.PORT
-
 const app = express()
 
-console.log(`[START] enviroment: ${process.env.ENVIROMENT}`)
-
+// Middlewares
 app.use(middlewares.logger)
 app.use(express.json({ inflate: true, strict: false, type: () => { return true } })) // Forcing parsing body as JSON, pwngrid doesn't set Content-Type header when making requests
 
-if (process.env.NODE_ENV === 'production') { app.use(cors({ origin: ['https://opwngrid.xyz', 'https://api.opwngrid.xyz'] })) }
+if (config.isProd()) { app.use(cors({ origin: ['https://opwngrid.xyz', 'https://api.opwngrid.xyz'] })) }
 
+// API routes
 app.use('/api/v1/units', routes.units)
 app.use('/api/v1/unit', routes.unit)
 app.use('/api/v1/uptime', routes.uptime)
@@ -33,7 +30,7 @@ app.use((req, res) => {
 })
 
 // App Listen ---------------------------
-app.listen(port, () => {
-  logger.info(`Server listening on port ${port}`)
+app.listen(config.api.port, () => {
+  logger.info(`Server listening on port ${config.api.port}`)
   logger.info(`Environment: ${process.env.NODE_ENV}`)
 })

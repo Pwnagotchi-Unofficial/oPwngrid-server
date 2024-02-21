@@ -1,7 +1,6 @@
-require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const logger = require('../logger')('auth')
-
+const config = require('../config').jwt
 module.exports = (req, res, next) => {
   if (!req.headers.authorization) {
     res.locals.authorised = false
@@ -12,7 +11,7 @@ module.exports = (req, res, next) => {
     if (token.length >= 63) {
       let decoded = null
       try {
-        decoded = jwt.verify(token, process.env.SECRET)
+        decoded = jwt.verify(token, config.secret)
       } catch (err) {
         logger.error(err)
         logger.info('Error Decoding sending 401')
