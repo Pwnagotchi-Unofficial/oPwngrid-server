@@ -121,7 +121,7 @@ const queries = {
     },
     markMessageUnseen (messageId, receiver, cb) {
       // TODO: what if the message doesn't exists?
-      db.query('UPDATE messages SET seen = NULL WHERE id = ? AND receiver = ?', [messageId, receiver], cb)
+      db.query('UPDATE messages SET seen_at = NULL WHERE id = ? AND receiver = ?', [messageId, receiver], cb)
     },
     deleteMessage (messageId, receiver, cb) {
       // TODO: what if the message doesn't exists?
