@@ -13,6 +13,7 @@ const app = express()
 console.log(`[START] enviroment: ${process.env.ENVIROMENT}`)
 
 app.use(middlewares.logger)
+app.use(express.json({ inflate: true, strict: false, type: () => { return true } })) // Forcing parsing body as JSON, pwngrid doesn't set Content-Type header when making requests
 
 if (process.env.NODE_ENV === 'production') { app.use(cors({ origin: ['https://opwngrid.xyz', 'https://api.opwngrid.xyz'] })) }
 

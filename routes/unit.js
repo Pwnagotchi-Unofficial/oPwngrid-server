@@ -131,7 +131,7 @@ router.get('/inbox/:messageId/:mark', utils.authenticate, (req, res) => {
   }
 })
 
-router.post('/enroll', utils.toJson, (req, res) => {
+router.post('/enroll', (req, res) => {
   // enroll sends
   // enrollment := map[string]interface{}{
   //  "identity":   identity,
@@ -139,6 +139,7 @@ router.post('/enroll', utils.toJson, (req, res) => {
   //  "signature":  signature64,
   //  "data":       c.data,
   // }
+
   logger.info('Enroll from: ' + req.body.identity)
 
   if (!req.body.identity && !req.body.public_key && !req.body.signature) {
@@ -203,7 +204,12 @@ router.post('/enroll', utils.toJson, (req, res) => {
         logger.warn('Error: data is missing or undefined')
         data = {}
       }
-      db.units.add(identity[0], identity[1], pubKey, addr, country, JSON.stringify(data), (results) => {
+      db.units.add(identity[0], identity[1], pubKey, addr, country, JSON.stringify(data), (err, results) => {
+        if (err) {
+          logger.error(err)
+          res.status(500).json({ error: 'Internal Server Error' })
+          return
+        }
         logger.info('Enrolled new')
         res.status(200).send(JSON.stringify({ token: updateToken(identity, results.insertId) }))
       })
@@ -232,7 +238,7 @@ router.post('/enroll', utils.toJson, (req, res) => {
   })
 })
 
-router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
+router.post('/report/ap', utils.authenticate, (req, res) => {
   logger.info('AP incoming')
 
   if (res.locals.authorised === false) {
@@ -299,7 +305,7 @@ router.post('/report/ap', utils.toJson, utils.authenticate, (req, res) => {
   })
 })
 
-router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
+router.post('/report/aps', utils.authenticate, (req, res) => {
   logger.info('AP received')
   if (res.locals.authorised === false) {
     logger.warn('Warning | Unauthorised device tried to send AP')
@@ -330,7 +336,7 @@ router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
           db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
             if (err) {
               // Handle the error, but don't send a response here
-              logger.error(err);
+              logger.error(err)
               res.status(500).json({ error: 'Internal Server Error' })
               return
             }
@@ -360,7 +366,7 @@ router.post('/report/aps', utils.toJson, utils.authenticate, (req, res) => {
   })
 })
 
-router.post('/:fingerprint/inbox', utils.toJson, utils.authenticate, (req, res) => {
+router.post('/:fingerprint/inbox', utils.authenticate, (req, res) => {
   if (res.locals.authorised === false) {
     logger.warn('Warning | Unauthorised device tried to send MESSAGEP')
     res.status(401).json({ error: 'Unauthorised request' })

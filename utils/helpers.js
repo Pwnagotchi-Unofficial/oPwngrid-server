@@ -1,24 +1,6 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
-function toJson (req, res, next) {
-  if (req.body === undefined) {
-    const buffer = []
-    req.on('data', function onRequestData (chunk) {
-      buffer.push(chunk)
-    })
-
-    req.once('end', function () {
-      const concated = Buffer.concat(buffer)
-      // console.log(concated.toString('utf8'))
-      req.body = JSON.parse(concated.toString('utf8'))
-      next()
-    })
-  } else {
-    next()
-  }
-}
-
 function authenticate (req, res, next) {
   if (!req.headers.authorization) {
     res.locals.authorised = false
@@ -54,4 +36,4 @@ function authenticate (req, res, next) {
   }
 }
 
-module.exports = { toJson, authenticate }
+module.exports = { authenticate }
