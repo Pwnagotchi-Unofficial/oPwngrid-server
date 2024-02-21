@@ -2,9 +2,9 @@
   "name": "pwngridcustom",
   "version": "1.2.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node src/server.js",
     "lint": "npx standard",
     "lint-fix": "npx standard --fix",
     "livereload": "nodemon server.js"
