@@ -1,10 +1,11 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
+const logger = require('../logger')('auth')
 
-function authenticate (req, res, next) {
+module.exports = (req, res, next) => {
   if (!req.headers.authorization) {
     res.locals.authorised = false
-    console.warn('Warning : unauthenticated request')
+    logger.warn('Warning : unauthenticated request')
     next()
   } else {
     const token = req.headers.authorization.slice('Bearer '.length)
@@ -13,8 +14,8 @@ function authenticate (req, res, next) {
       try {
         decoded = jwt.verify(token, process.env.SECRET)
       } catch (err) {
-        console.log(err)
-        console.log('Error Decoding sending 401')
+        logger.error(err)
+        logger.info('Error Decoding sending 401')
         res.status(401).json({ error: 'token expired or cannot be authenticated' })
         return
       }
@@ -22,18 +23,16 @@ function authenticate (req, res, next) {
       if (decoded.authorized === true) {
         res.locals.author = decoded
         res.locals.authorised = true
-        console.warn('Warning : authenticated request from ' + res.locals.author.unit_ident[1])
+        logger.warn('Warning : authenticated request from ' + res.locals.author.unit_ident[1])
       } else if (decoded.authorized === false) {
-        console.warn('Warning : unauthenticated request from ' + res.locals.author.unit_ident[1])
+        logger.warn('Warning : unauthenticated request from ' + res.locals.author.unit_ident[1])
         res.locals.authorised = false
       }
       next()
       return
     }
     res.locals.authorised = false
-    console.warn('Warning : unauthenticated request')
+    logger.warn('Warning : unauthenticated request')
     next()
   }
 }
-
-module.exports = { authenticate }

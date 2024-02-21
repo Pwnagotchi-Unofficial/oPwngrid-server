@@ -3,13 +3,13 @@ const updateToken = require('../utils/token.js')
 const crypto = require('crypto')
 require('dotenv').config()
 const db = require('../db')
-const utils = require('../utils/helpers')
+const authenticate = require('../middlewares').authenticate
 const logger = require('../logger')('routes-unit')
 
 const router = express.Router()
 
 // Base endpoint: /api/v1/unit
-router.get('/inbox', utils.authenticate, (req, res) => {
+router.get('/inbox', authenticate, (req, res) => {
   if (res.locals.authorised === false) {
     logger.warn('Unauthorised request to mailbox')
     res.status(401).json({ error: 'token expired or cannot be authenticated' })
@@ -58,7 +58,7 @@ router.get('/inbox', utils.authenticate, (req, res) => {
   })
 })
 
-router.get('/:fingerprint', utils.authenticate, (req, res) => {
+router.get('/:fingerprint', authenticate, (req, res) => {
   // got unit search
   // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
   logger.info('Got unit search for ' + req.params.fingerprint)
@@ -77,7 +77,7 @@ router.get('/:fingerprint', utils.authenticate, (req, res) => {
   })
 })
 
-router.get('/inbox/:messageId', utils.authenticate, (req, res) => {
+router.get('/inbox/:messageId', authenticate, (req, res) => {
   if (res.locals.authorised) {
     db.inbox.message(req.params.messageId, res.locals.author.unit_ident[1], (err, message) => {
       if (err) {
@@ -93,7 +93,7 @@ router.get('/inbox/:messageId', utils.authenticate, (req, res) => {
   }
 })
 
-router.get('/inbox/:messageId/:mark', utils.authenticate, (req, res) => {
+router.get('/inbox/:messageId/:mark', authenticate, (req, res) => {
   if (req.params.mark === 'seen') {
     // mark message seen
     db.inbox.markMessageSeen(req.params.messageId, res.locals.author.unit_ident[1], (err) => {
@@ -238,7 +238,7 @@ router.post('/enroll', (req, res) => {
   })
 })
 
-router.post('/report/ap', utils.authenticate, (req, res) => {
+router.post('/report/ap', authenticate, (req, res) => {
   logger.info('AP incoming')
 
   if (res.locals.authorised === false) {
@@ -305,7 +305,7 @@ router.post('/report/ap', utils.authenticate, (req, res) => {
   })
 })
 
-router.post('/report/aps', utils.authenticate, (req, res) => {
+router.post('/report/aps', authenticate, (req, res) => {
   logger.info('AP received')
   if (res.locals.authorised === false) {
     logger.warn('Warning | Unauthorised device tried to send AP')
@@ -366,7 +366,7 @@ router.post('/report/aps', utils.authenticate, (req, res) => {
   })
 })
 
-router.post('/:fingerprint/inbox', utils.authenticate, (req, res) => {
+router.post('/:fingerprint/inbox', authenticate, (req, res) => {
   if (res.locals.authorised === false) {
     logger.warn('Warning | Unauthorised device tried to send MESSAGEP')
     res.status(401).json({ error: 'Unauthorised request' })

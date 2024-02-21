@@ -1,12 +1,12 @@
 const express = require('express')
 const db = require('../db')
-const utils = require('../utils/helpers')
+const authenticate = require('../middlewares').authenticate
 const logger = require('../logger')('routes-search')
 
 const router = express.Router()
 
 // Base endpoint: /api/v1/search
-router.get('/:fingerprint', utils.authenticate, (req, res) => {
+router.get('/:fingerprint', authenticate, (req, res) => {
   // got unit search
   // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
   logger.info('Got web search for ' + req.params.fingerprint)
