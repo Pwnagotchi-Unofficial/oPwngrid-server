@@ -80,8 +80,18 @@ const queries = {
     search (bssid, cb) {
       db.query("SELECT bssid, essid, identity FROM aps WHERE bssid = (UNHEX(REPLACE(?, ':','' )))", [bssid], cb)
     },
+    searchMultiple (aps, cb) {
+      const rows = []
+      for (const ap of aps) rows.push(Buffer.from(ap.bssid.replace(/:/g, ''), 'hex'))
+      db.query('SELECT bssid, essid, identity FROM aps WHERE bssid IN (?)', [rows], cb)
+    },
     add (bssid, essid, identity, cb) {
       db.query("INSERT INTO aps (bssid, essid, identity, time) VALUES (UNHEX(REPLACE(?, ':','' )), ?,?, CURRENT_TIMESTAMP)", [bssid, essid, identity], cb)
+    },
+    addMultiple (aps, identity, cb) {
+      const rows = []
+      for (const ap of aps) rows.push([Buffer.from(ap.bssid.replace(/:/g, ''), 'hex'), ap.essid, identity, new Date()])
+      db.query('INSERT INTO aps (bssid, essid, identity, time) VALUES ?', [rows], cb)
     }
   },
   inbox: {

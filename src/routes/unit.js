@@ -311,57 +311,38 @@ router.post('/report/aps', authenticate, (req, res) => {
     res.status(401).json({ error: 'Unauthorised request' })
     return
   }
-  req.body.forEach(function (ap) {
-    db.accessPoints.search(ap.bssid, (err, aps) => {
-      if (err) {
-        logger.error(err)
-        res.status(500).json({ error: 'Internal Server Error' })
-        return
-      }
-      // console.log("Lets see if its been reported before");
-      // If results is 0, the ap doesnt exist, but if its 1 or more, multiple devices have reported it.
-      if (aps.length >= 1) {
-        let reported = false
-        for (const element of aps) {
-          if (element.identity === res.locals.author.unit_ident[1]) {
-            reported = true
-            break
-          }
-        }
-        if (reported === false) {
+  db.accessPoints.searchMultiple(req.body, (err, aps) => {
+    if (err) {
+      logger.error(err)
+      res.status(500).json({ error: 'Internal Server Error' })
+      return
+    }
+    const bssids = aps.map(ap => Buffer.from(ap.bssid, 'binary').toString('utf-8'))
+
+    const newAps = []
+    for (const ap of req.body) {
+      const reportedIndex = bssids.indexOf(Buffer.from(ap.bssid.replace(/:/g, ''), 'hex').toString('utf-8'))
+      if (reportedIndex > -1) {
+        if (aps[reportedIndex].identity !== res.locals.author.unit_ident[1]) {
           logger.info('AP has not been reported before from this identity')
-          // unit has not reported the AP before so continue to add it to db
-          // add stuff here to include the AP even if its been reported, not sure how, maybe an array. Ok so now is adding another row for the same AP
-          db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
-            if (err) {
-              // Handle the error, but don't send a response here
-              logger.error(err)
-              res.status(500).json({ error: 'Internal Server Error' })
-              return
-            }
-            // Send a response when the insertion is successful
-            res.status(200).json({ status: 'success' })
-          })
-        } else {
-          // console.log("It has been reported sending 200, but not storing it again");
-          res.status(200).json({ status: 'success' })
+          newAps.push(ap)
         }
-      } else if (aps.length === 0) {
-        // console.log("it hasnt been reported before");
-        // Because no APs exist with that SSID, add it to the database.
-        db.accessPoints.add(ap.bssid, ap.essid, res.locals.author.unit_ident[1], (err) => {
-          if (err) {
-            // Handle the error, but don't send a response here
-            logger.error(err)
-            res.status(500).json({ error: 'Internal Server Error' })
-            return
-          }
-          // Send a response when the insertion is successful
-          logger.info('sending 200 for a new AP')
-          res.status(200).json({ status: 'success' })
-        })
+      } else {
+        logger.info('AP first time reported')
+        newAps.push(ap)
       }
-    })
+    }
+    if (newAps.length > 0) {
+      db.accessPoints.addMultiple(newAps, res.locals.author.unit_ident[1], (err) => {
+        if (err) {
+          logger.error(err)
+          res.status(500).json({ error: 'Internal Server Error' })
+          return
+        }
+
+        res.status(200).json({ status: 'success' })
+      })
+    } else { res.status(200).json({ status: 'success' }) }
   })
 })
 
