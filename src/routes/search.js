@@ -5,13 +5,32 @@ const logger = require('../logger')('routes-search')
 
 const router = express.Router()
 
-// Base endpoint: /api/v1/search
+function getLimit (req) {
+  if (!req.query.limit || isNaN(req.query.limit) || req.query.limit > 10) {
+    return 10
+  } else {
+    return parseInt(req.query.limit)
+  }
+}
+
+function getName (req) {
+  if (req.query.name || req.query.name.length > 32) {
+    return ''
+  } else {
+    return req.query.name
+  }
+}
+
+// Base endpoint: /api/v1/search/
 router.get('/:fingerprint', authenticate, (req, res) => {
-  // got unit search
+  // e.g /fingerprint?limit=10&name=lor%
+  // got unit search for web
   // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
   logger.info('Got web search for ' + req.params.fingerprint)
   // Query fingerprint via mysql
-  db.units.webSearch(req.params.fingerprint, (err, unit) => {
+  const limit = getLimit(req)
+  const name = getName(req)
+  db.units.webSearch(req.params.fingerprint, name , limit, (err, unit) => {
     if (err) {
       logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })

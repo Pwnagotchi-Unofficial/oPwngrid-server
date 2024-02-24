@@ -58,7 +58,7 @@ router.get('/inbox', authenticate, (req, res) => {
 })
 
 router.get('/:fingerprint', authenticate, (req, res) => {
-  // got unit search
+  // got unit search, from pwngrid binary
   // https://pwnagotchi.ai/api/grid/#get-api-v1-unit-fingerprint
   logger.info('Got unit search for ' + req.params.fingerprint)
   // Query fingerprint via mysql

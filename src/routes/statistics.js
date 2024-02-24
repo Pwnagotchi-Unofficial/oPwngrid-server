@@ -2,7 +2,7 @@ const express = require('express')
 const db = require('../db')
 const logger = require('../logger')('routes-statistics')
 
-// All handlers for page with global statistics
+// All handlers for page with global statistics and specific units
 function getDays (req) {
   if (!req.params.days || isNaN(req.query.days) || req.query.days > 365) {
     return 365
@@ -18,16 +18,34 @@ function getUnits (req) {
     return parseInt(req.query.units)
   }
 }
+// makes sure the unit fingerprint is ok.
+function getUnit (req) {
+  if (!req.query.unit || req.query.unit.length < 63) {
+    return null
+  } else {
+    return req.query.unit
+  }
+}
 
 const router = express.Router()
 
 // Base endpoint: /api/statistics
 router.get('/apsByDay', (req, res) => {
+  // e.g /apsbyDay?unit=fingerprint
   const days = getDays(req)
-  db.statistics.apsByDay(days, (err, results) => {
+  const unit = getUnit(req)
+  if (req.query.unit && unit == null){
+    res.status(200).json({ status: 'Fingerprint does not conform' })
+    return
+  }
+  db.statistics.apsByDay(days, unit, (err, results) => {
     if (err) {
       logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })
+      return
+    }
+    if (results.length === 0) {
+      res.status(200).json({ status: 'Fingerprint does not exist' })
       return
     }
     res.send(results)

@@ -36,15 +36,27 @@ const queries = {
         cb(null, result)
       })
     },
-    webSearch (fingerprint, cb) {
-      db.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1', [fingerprint, fingerprint], (err, result) => {
-        if (err) {
-          cb(err)
+    webSearch (fingerprint, name = null, limit = 10, cb) {
+      if (name !== null) {
+        name = name + "%"
+        db.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ? OR name LIKE ? LIMIT ?', [fingerprint, name, limit], (err, result) => {
+          if (err) {
+            cb(err)
+            return
+          }
+          if (result.length === 0) { cb(null, null) } else { cb(null, result[0]) }
           return
-        }
-
-        if (result.length === 0) { cb(null, null) } else { cb(null, result[0]) }
-      })
+        })
+      }
+      else {
+        db.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT ?', [fingerprint, fingerprint], (err, result) => {
+          if (err) {
+            cb(err)
+            return
+          }
+          if (result.length === 0) { cb(null, null) } else { cb(null, result[0]) }
+        })
+      }
     },
     gridSearch (fingerprint, cb) {
       db.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?', [fingerprint], (err, result) => {
@@ -90,7 +102,7 @@ const queries = {
     },
     addMultiple (aps, identity, cb) {
       const rows = []
-      for (const ap of aps) rows.push([Buffer.from(ap.bssid.replace(/:/g, ''), 'hex'), ap.essid, identity, new Date()])
+      for (const ap of aps) rows.push([Buffer.from(ap.bssid.replace(/:/g, ''), 'hex'), ap.essid, identity, 'CURRENT_TIMESTAMP'])
       db.query('INSERT INTO aps (bssid, essid, identity, time) VALUES ?', [rows], cb)
     }
   },
@@ -135,8 +147,12 @@ const queries = {
     }
   },
   statistics: {
-    apsByDay (days, cb) {
-      db.query("SELECT DATE_FORMAT(time, '%Y-%m-%d') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?", [days], cb)
+    apsByDay (days, unit = null, cb) {
+      if (unit != null) {
+        db.query("SELECT DATE_FORMAT(time, '%Y-%m-%d') AS day, COUNT(ID) AS reported FROM aps WHERE identity = ? GROUP BY day ORDER BY day DESC LIMIT ?", [unit, days], cb)
+      } else {
+        db.query("SELECT DATE_FORMAT(time, '%Y-%m-%d') AS day, COUNT(ID) AS reported FROM aps GROUP BY day ORDER BY day DESC LIMIT ?", [days], cb)
+      }
     },
     messagesByDay (days, cb) {
       db.query("SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, COUNT(ID) AS messages FROM messages GROUP BY day ORDER BY day DESC LIMIT ?", [days], cb)
