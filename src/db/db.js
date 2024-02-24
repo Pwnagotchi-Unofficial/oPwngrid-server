@@ -36,27 +36,25 @@ const queries = {
         cb(null, result)
       })
     },
-    webSearch (fingerprint, name = null, limit = 10, cb) {
-      if (name !== null) {
-        name = name + "%"
-        db.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ? OR name LIKE ? LIMIT ?', [fingerprint, name, limit], (err, result) => {
+    webSearch (fingerprint, cb) {
+      db.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1', [fingerprint, fingerprint], (err, result) => {
+        if (err) {
+          cb(err)
+          return
+        }
+        if (result.length === 0) { cb(null, null) } else { cb(null, result[0]) }
+      })
+    },
+    webSearchByName (nameR = null, limit = 10, cb) {
+        nameR = nameR + "%"
+        db.query('SELECT name,identity FROM units WHERE name LIKE ? LIMIT ?', [nameR, limit], (err, result) => {
           if (err) {
             cb(err)
             return
           }
-          if (result.length === 0) { cb(null, null) } else { cb(null, result[0]) }
+          if (result.length === 0) { cb(null, null) } else { cb(null, result) }
           return
         })
-      }
-      else {
-        db.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT ?', [fingerprint, fingerprint], (err, result) => {
-          if (err) {
-            cb(err)
-            return
-          }
-          if (result.length === 0) { cb(null, null) } else { cb(null, result[0]) }
-        })
-      }
     },
     gridSearch (fingerprint, cb) {
       db.query('SELECT created_at,updated_at,country,name,identity,data,public_key FROM units WHERE identity = ?', [fingerprint], (err, result) => {
