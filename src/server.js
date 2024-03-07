@@ -5,6 +5,8 @@ const routes = require('./routes')
 const logger = require('./logger')('main')
 const middlewares = require('./middlewares')
 
+const version = require('./VERSION.js')
+
 const app = express()
 
 // Middlewares
@@ -32,5 +34,5 @@ app.use((req, res) => {
 // App Listen ---------------------------
 app.listen(config.api.port, () => {
   logger.info(`Server listening on port ${config.api.port}`)
-  logger.info(`Environment: ${process.env.NODE_ENV}`)
+  logger.info(`Environment: ${process.env.NODE_ENV}, running version: ${version}`)
 })
