@@ -5,6 +5,7 @@ const total = require('./total')
 const recent = require('./recent')
 const search = require('./search')
 const statistics = require('./statistics')
+const notices = require('./notices')
 
 module.exports = {
   units,
@@ -13,5 +14,6 @@ module.exports = {
   total,
   recent,
   search,
-  statistics
+  statistics,
+  notices
 }

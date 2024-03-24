@@ -23,6 +23,7 @@ app.use('/api/v1/total', routes.total)
 app.use('/api/v1/recent', routes.recent)
 app.use('/api/v1/search', routes.search)
 app.use('/api/statistics', routes.statistics) // FIXME: doesn't follow APIs logic -> should be changed to /api/v1/statistics
+app.use('/api/v1/notices', routes.notices)
 
 // 404 not found
 app.use((req, res) => {
