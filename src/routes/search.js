@@ -47,7 +47,6 @@ router.get('/byName/:name', (req, res) => {
   logger.info('Got web search for ' + req.params.name)
   const name = getName(req)
   const limit = getLimit(req)
-  logger.info(limit)
   db.units.webSearchByName(name , limit, (err, names) => {
     if (err) {
       logger.error(err)
@@ -59,7 +58,6 @@ router.get('/byName/:name', (req, res) => {
       res.status(404).json({ error: 'Not Found' })
       return
     }
-    logger.info(names)
     res.json(names)
   })
 })

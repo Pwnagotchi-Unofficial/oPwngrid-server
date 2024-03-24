@@ -47,7 +47,7 @@ const queries = {
     },
     webSearchByName (nameR = null, limit = 10, cb) {
         nameR = nameR + "%"
-        db.query('SELECT name,identity FROM units WHERE name LIKE ? LIMIT ?', [nameR, limit], (err, result) => {
+        db.query('SELECT name,identity,country FROM units WHERE name LIKE ? LIMIT ?', [nameR, limit], (err, result) => {
           if (err) {
             cb(err)
             return
