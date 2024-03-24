@@ -43,7 +43,7 @@ router.get('/countries', (req, res) => {
   })
 })
 
-router.get('/ByCountry/:name', (req, res) => {
+router.get('/ByCountry/:name?', (req, res) => {
   // TODO: add pages like messages
   data = req.query.data
   limit = getUnits(req)
