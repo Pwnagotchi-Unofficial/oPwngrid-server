@@ -14,6 +14,13 @@ function getUnits (req) {
   }
 }
 
+function getName (req) {
+  if (!req.params.name || req.params.name.length > 32) {
+    return ''
+  } else {
+    return req.params.name
+  }
+}
 
 // Base endpoint: /api/v1/units
 router.get('/', (req, res) => {
@@ -41,6 +48,20 @@ router.get('/ByCountry', (req, res) => {
   data = req.query.data
   limit = getUnits(req)
   db.units.byCountry(req.query.country, limit, data, (err, units) => {
+    if (err) {
+      logger.error(err)
+      res.status(500).json({ error: 'Internal Server Error' })
+      return
+    }
+    res.json(units)
+  })
+})
+
+router.get('/ByCountry/:name', (req, res) => {
+  // TODO: add pages like messages
+  data = req.query.data
+  limit = getUnits(req)
+  db.units.byCountry(req.query.country, limit, data, getName(req), (err, units) => {
     if (err) {
       logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })

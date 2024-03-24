@@ -77,11 +77,21 @@ const queries = {
     update (identity, name, data, cb) {
       db.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1', [data, name, identity], cb)
     },
-    byCountry (country, limit, data=false, cb) {
+    byCountry (country, limit, data=false, name = false, cb) {
       if (data) {
-        db.query('SELECT * FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
+        if (name) {
+          name = name + "%"
+          db.query('SELECT * FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, limit], cb)
+        } else {
+          db.query('SELECT * FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
+        }
       } else {
-        db.query('SELECT name,identity,country FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
+        if (name) {
+          name = name + "%"
+          db.query('SELECT name,identity,country FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, limit], cb)
+        } else {
+          db.query('SELECT name,identity,country FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
+        }
       }
     },
     countries (cb) {
