@@ -14,5 +14,4 @@ COPY --from=build /src/node_modules ./node_modules
 COPY ./src .
 RUN touch .env
 
-
 CMD [ "node", "server.js" ]
