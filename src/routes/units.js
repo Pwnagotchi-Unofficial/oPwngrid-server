@@ -61,7 +61,7 @@ router.get('/ByCountry/:name', (req, res) => {
   // TODO: add pages like messages
   data = req.query.data
   limit = getUnits(req)
-  db.units.byCountry(req.query.country, limit, data, getName(req), (err, units) => {
+  db.units.byCountry(req.query.country, limit, getName(req), data, (err, units) => {
     if (err) {
       logger.error(err)
       res.status(500).json({ error: 'Internal Server Error' })

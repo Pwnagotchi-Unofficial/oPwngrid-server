@@ -77,8 +77,8 @@ const queries = {
     update (identity, name, data, cb) {
       db.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1', [data, name, identity], cb)
     },
-    byCountry (country, limit=100, data=false, name = false, cb) {
-      
+    byCountry (country, limit=100, name = false,data=false, cb) {
+      console.log(name)
       if (data) {
         if (name) {
           name = name + "%"
