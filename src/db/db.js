@@ -81,14 +81,14 @@ const queries = {
       if (data) {
         if (name) {
           name = name + "%"
-          db.query('SELECT * FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, limit], cb)
+          db.query('SELECT * FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, name, limit], cb)
         } else {
           db.query('SELECT * FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
         }
       } else {
         if (name) {
           name = name + "%"
-          db.query('SELECT name,identity,country FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, limit], cb)
+          db.query('SELECT name,identity,country FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, name, limit], cb)
         } else {
           db.query('SELECT name,identity,country FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
         }
