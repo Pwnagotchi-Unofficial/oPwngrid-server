@@ -78,9 +78,10 @@ const queries = {
       db.query('UPDATE units SET data=?, updated_at = CURRENT_TIMESTAMP, name = ? WHERE identity = ? LIMIT 1', [data, name, identity], cb)
     },
     byCountry (country, limit=100, data=false, name = false, cb) {
-      name = name + "%"
+      
       if (data) {
         if (name) {
+          name = name + "%"
           db.query('SELECT * FROM units WHERE country = ? and name LIKE ? LIMIT ?', [country, name, limit], cb)
         } else {
           db.query('SELECT * FROM units WHERE country = ? LIMIT ?', [country, limit], cb)
