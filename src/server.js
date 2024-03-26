@@ -13,7 +13,7 @@ const app = express()
 app.use(middlewares.logger)
 app.use(express.json({ inflate: true, strict: false, type: () => { return true } })) // Forcing parsing body as JSON, pwngrid doesn't set Content-Type header when making requests
 
-if (config.isProd()) { app.use(cors({ origin: ['https://opwngrid.xyz', 'https://api.opwngrid.xyz', 'https://grid.pwnagotchi.org'] })) }
+if (config.isProd()) { app.use(cors({ origin: ['https://opwngrid.xyz', 'https://api.opwngrid.xyz', 'https://grid.pwnagotchi.org', 'https://www.opwngrid.xyz'] })) }
 
 // API routes
 app.use('/api/v1/units', routes.units)
