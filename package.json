@@ -20,7 +20,7 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.2",
-    "mysql2": "^3.6.1",
+    "mysql2": "^3.9.8",
     "pino": "^8.18.0",
     "pino-pretty": "^10.3.1"
   },
