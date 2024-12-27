@@ -15,4 +15,15 @@ router.get('/', (req, res) => {
     res.send(units)
   })
 })
+
+router.get('/ping', (req, res) => {
+  db.units.recentPing((err, units) => {
+    if (err) {
+      logger.error(err)
+      res.status(500).json({ error: 'Internal Server Error' })
+      return
+    }
+    res.send(units)
+  })
+})
 module.exports = router

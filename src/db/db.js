@@ -36,6 +36,16 @@ const queries = {
         cb(null, result)
       })
     },
+    recentPing (cb) {
+      db.query('SELECT name,data,created_at,country,identity,updated_at FROM units WHERE updated_at > NOW() - INTERVAL 1000 DAY ORDER BY updated_at DESC LIMIT 10;', (err, result) => {
+        if (err) {
+          cb(err)
+          return
+        }
+
+        cb(null, result)
+      })
+    },
     webSearch (fingerprint, cb) {
       db.query('SELECT created_at,updated_at,country,name,identity,data,public_key, (SELECT COUNT(aps.identity) FROM aps WHERE identity = ?) AS amount FROM units WHERE identity = ? LIMIT 1', [fingerprint, fingerprint], (err, result) => {
         if (err) {
